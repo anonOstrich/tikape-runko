@@ -4,13 +4,49 @@
     <head>
         <title>Otsikko</title>
         <meta charset="utf-8" />
+        <style>
+            ul{list-style: none;}
+            
+            .menuelement{display:inline;float:left;}
+            .listelement{text-align: left};
+        </style>
     </head>
 
     <body>
-        <h1>Heippa vaan!</h1>
 
-        <p>Ja .. <span th:text="${viesti}">jotain?</span></p>
+        <div>
+            <ul>
+                <li class = "menuelement">
+                    <h3>Alue</h3>
+                    <ul>
+                        <li th:each="alue:${alueet}" class="listelement">
+                            <span th:text="${alue}">alueen nimi</span>
+                        </li>
+                    </ul>
+                </li>
+                <li class = "menuelement">
+                    <h3>Viestejä yhteensä</h3>
+                    <ul>
+                        <li th:each="lkm:${viestienLukumaarat}" class="listelement">
+                            <span th:text="${lkm}">alueen nimi</span>
+                        </li>
+                    </ul>
+                </li>
+                <li class = "menuelement">
+                    <h3>Viimeisin viesti</h3>
+                    <ul>
+                        <li th:each="uusi:${uusimmat}" class="listelement">
+                            <span th:text="${uusi}">alueen nimi</span>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
 
-        <p><a href="/opiskelijat">Tästä opiskelijalistaukseen.</a></p>
+        <!--        <h1>Heippa vaan!</h1>
+        
+                <p>Ja .. <span th:text="${viesti}">jotain?</span></p>
+        
+                <p><a href="/opiskelijat">Tästä opiskelijalistaukseen.</a></p>-->
     </body>
 </html>

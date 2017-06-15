@@ -1,0 +1,57 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8"/>
+            <style>
+                ul{
+                    list-style:none;
+                    padding:0;
+                }
+
+                .menuelement{display:inline;
+                             float:left;
+                             margin-right: 1em;}
+
+                .listelement{
+                    text-align: left;
+                }
+
+                .buttonelement{
+
+                }
+            </style>
+    </head>
+    <body>
+        <div>
+            <ul>
+                <li class = "menuelement">
+                    <h3>Alue: <span th:text="${aluenimi}">aluenimi</span></h3>
+                    <ul>
+                        <li th:each="avaus:${avaukset}" class="listelement">
+                            <span th:text="${avaus}">avauksen nimi</span>
+                        </li>
+                    </ul>
+                </li>
+                <li class = "menuelement">
+                    <h3>Viestej&#228;</h3>
+                    <ul>
+                        <li th:each="lkm:${viestienLukumaarat}" class="listelement">
+                            <span th:text="${lkm}">lukumaara</span>
+                        </li>
+                    </ul>
+                </li>
+                <li class = "menuelement">
+                    <h3>Viimeisin viesti</h3>
+                    <ul>
+                        <li th:each="uusi:${uusimmat}" class="listelement">
+                            <span th:text="${uusi}">aikaleima</span>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+    </body>
+</html>

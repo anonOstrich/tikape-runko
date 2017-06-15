@@ -11,5 +11,5 @@ public interface Dao<T, K> {
 
     void delete(K key) throws SQLException;
     
-    List<List<String>> createView() throws SQLException; 
+    //List<List<Object>> createView() throws SQLException; 
 }

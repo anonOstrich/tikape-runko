@@ -38,9 +38,8 @@ public class KeskustelualueDao implements Dao<Keskustelualue, Integer> {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
-    public List<List<String>> createView() throws SQLException {
-        String query = "SELECT alue.nimi AS alue, COUNT(viesti.sisalto) viestejä, MAX(viesti.aika) viimeisin_viesti "
+    public List<List<Object>> createView() throws SQLException {
+        String query = "SELECT alue.nimi AS alue, alue.id AS id, COUNT(viesti.sisalto) viestejä, MAX(viesti.aika) viimeisin_viesti "
                 + "FROM Keskustelualue alue "
                 + "LEFT JOIN Keskustelunavaus avaus ON alue.id = avaus.keskustelualue "
                 + "LEFT JOIN Viesti ON avaus.id = Viesti.keskustelunavaus "
@@ -50,24 +49,30 @@ public class KeskustelualueDao implements Dao<Keskustelualue, Integer> {
         Statement stmt = connection.createStatement();
         ResultSet rs = stmt.executeQuery(query);
 
-        List<List<String>> listat = new ArrayList();
-        List<String> alueet = new ArrayList();
-        List<String> lukumaarat = new ArrayList();
-        List<String> uusimmat = new ArrayList();
+        List<List<Object>> listat = new ArrayList();
+        List<Object> alueet = new ArrayList();
+        List<Object> lukumaarat = new ArrayList();
+        List<Object> uusimmat = new ArrayList();
 
         while (rs.next()) {
-            String alue = rs.getString("alue");
-            String lkm = "" + rs.getInt(2);
+            // MUUTOS
+            String aluenimi = rs.getString("alue");
+            int id = rs.getInt("id");
+            Keskustelualue alue = new Keskustelualue(id, aluenimi);
+            
+            // MUUTOS
+            
+            String lkm = "" + rs.getInt(3);
             String uusin = "" + rs.getString("viimeisin_viesti");
 
             alueet.add(alue);
             lukumaarat.add(lkm);
+            
             if (uusin == null || uusin.length() < 6) {
                 uusimmat.add("Ei viestejä");
             } else {
                 uusimmat.add(uusin);
             }
-     
 
         }
         rs.close();
@@ -78,5 +83,15 @@ public class KeskustelualueDao implements Dao<Keskustelualue, Integer> {
         listat.add(uusimmat);
 
         return listat;
+    }
+
+    public boolean addNew(Keskustelualue alue) {
+        if (alue.getNimi().isEmpty()) return false; 
+        try {
+            int muutokset = database.update("INSERT INTO Keskustelualue(nimi) VALUES (?);", alue.getNimi());
+            return true; 
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

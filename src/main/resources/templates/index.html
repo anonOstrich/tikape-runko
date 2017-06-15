@@ -17,6 +17,10 @@
             .listelement{
                 text-align: left;
             }
+            
+            .buttonelement{
+                
+            }
         </style>
     </head>
 
@@ -28,7 +32,7 @@
                     <h3>Alue</h3>
                     <ul>
                         <li th:each="alue:${alueet}" class="listelement">
-                            <span th:text="${alue}">alueen nimi</span>
+                            <a th:href="${'/alue/' + alue.id}" th:text="${alue.nimi}">alueen nimi</a>
                         </li>
                     </ul>
                 </li>
@@ -36,7 +40,7 @@
                     <h3>Viestej&#228; yhteens&#228;</h3>
                     <ul>
                         <li th:each="lkm:${viestienLukumaarat}" class="listelement">
-                            <span th:text="${lkm}">alueen nimi</span>
+                            <span th:text="${lkm}">lukumaara</span>
                         </li>
                     </ul>
                 </li>
@@ -44,11 +48,19 @@
                     <h3>Viimeisin viesti</h3>
                     <ul>
                         <li th:each="uusi:${uusimmat}" class="listelement">
-                            <span th:text="${uusi}">alueen nimi</span>
+                            <span th:text="${uusi}">aikaleima</span>
                         </li>
                     </ul>
                 </li>
             </ul>
+        </div>
+        
+        <div>
+            <form method="POST" action="/">
+                Anna alueen nimi:
+                <input type="text" name="aluenimi"/>
+                <input type="submit" value="Lis&#228;&#228; uusi alue"/>
+            </form>
         </div>
 
         <!--        <h1>Heippa vaan!</h1>

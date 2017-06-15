@@ -5,10 +5,18 @@
         <title>Otsikko</title>
         <meta charset="utf-8" />
         <style>
-            ul{list-style:none; padding:0;}
+            ul{
+                list-style:none;
+                padding:0;
+            }
             
-            .menuelement{display:inline; float:left;}
-            .listelement{text-align: left;}
+            .menuelement{display:inline;
+                        float:left;
+                        margin-right: 1em;}
+            
+            .listelement{
+                text-align: left;
+            }
         </style>
     </head>
 
@@ -25,7 +33,7 @@
                     </ul>
                 </li>
                 <li class = "menuelement">
-                    <h3>Viestejä yhteensä</h3>
+                    <h3>Viestej&#228; yhteens&#228;</h3>
                     <ul>
                         <li th:each="lkm:${viestienLukumaarat}" class="listelement">
                             <span th:text="${lkm}">alueen nimi</span>

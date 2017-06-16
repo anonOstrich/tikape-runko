@@ -13,10 +13,14 @@ public class Database {
         this.databaseAddress = databaseAddress;
         init();
     }
+    
+    public boolean usesPostgres(){
+        return this.databaseAddress.contains("postgres");
+    }
 
     private void init() {
         List<String> lauseet = null;
-        if (this.databaseAddress.contains("postgres")) {
+        if (this.usesPostgres()) {
             lauseet = postgreLauseet();
         } else {
             lauseet = sqliteLauseet();

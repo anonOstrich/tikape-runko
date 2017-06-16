@@ -24,19 +24,16 @@ public class KeskustelunavausDao implements Dao<Keskustelunavaus, Integer> {
     }
 
 
-    public void createFirstMessage(int alue_id, String avaus_nimi, String sisalto, String nimimerkki) throws SQLException {
-//        String query = "BEGIN TRANSACTION; "
-//                + "INSERT INTO Keskustelunavaus(keskustelualue, nimi) VALUES (?, ?);"
-//                + "INSERT INTO Viesti VALUES((SELECT MAX(id) FROM Keskustelunavaus), ?, ?, datetime('now'));"
-//                + "COMMIT;";   
-
-        // database.update(query, alue_id, avaus_nimi, sisalto, nimimerkki);
+    public int createFirstMessage(int alue_id, String avaus_nimi, String sisalto, String nimimerkki) throws SQLException { 
         database.update("BEGIN TRANSACTION;");
         database.update("INSERT INTO Keskustelunavaus(keskustelualue, nimi) VALUES (?, ?);",
                 alue_id, avaus_nimi);
         database.update("INSERT INTO Viesti (keskustelunavaus, sisalto, nimimerkki) VALUES((SELECT MAX(id) FROM Keskustelunavaus), ?, ?);",
                 sisalto, nimimerkki);
+        List<Integer> palautettava =database.queryAndCollect("SELECT MAX(id) from Keskustelunavaus;", rs -> rs.getInt(1));
         database.update("COMMIT;");
+        
+        return palautettava.get(0);
 
     }
 

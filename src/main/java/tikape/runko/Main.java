@@ -123,14 +123,10 @@ public class Main {
                 // tähän jokin virheviesti. 
             }
 
-            //TODO: Lisää tietokantaan nämä tiedot. Ohjaa viestiketjuun (vaiheessa 2 ehkä ko. keskustelualueelle?) 
-            //ajatus: max(id) ja transaction saattavat auttaa (pitää lisätä sekä alueeksi että ko. alueelle aloitusviesti)
-            //Lisätään keskustelualuetauluun ja viestitauluun
-            //Ensin lisätään toinen, sitten haetaan? Transaktiolla? Ei voi lisätä vain toista, mikä plussa
-            //Ensin lisättäisiin keskustelunavaukseen -> SELECT MAX ID, antaa äsken lisätyn id.n
-            //
-            keskustelunavausDao.createFirstMessage(alue_id, otsikko, sisalto, nimimerkki);
-            res.redirect("/alue/" + alue_id);
+            //luo viestin ja palauttaa viestiä vastaavan avauksen id:n
+            int avaus_id = keskustelunavausDao.createFirstMessage(alue_id, otsikko, sisalto, nimimerkki);
+            res.redirect("/avaus/" + avaus_id);
+            
             return null;
         });
 

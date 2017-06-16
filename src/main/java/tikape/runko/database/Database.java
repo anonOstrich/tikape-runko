@@ -41,7 +41,13 @@ public class Database {
     public int update(String query, Object... params) throws SQLException{
         PreparedStatement stmt = connection.prepareStatement(query);
         
+        //DIAGNOSTINEN SOUT
+        System.out.println("Parametrien lkm: " + params.length);
+        
+        //POISTA KUN DIAG
+        
         for (int i = 0; i < params.length; i++){
+            System.out.println("Indeksi: " + i);
             stmt.setObject(i + 1, params[i]);
         }
         

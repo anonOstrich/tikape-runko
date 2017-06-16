@@ -41,15 +41,18 @@ public class Main {
 
             data.put("alueet", nakyma.get(0));
             data.put("viestienLukumaarat", nakyma.get(1));
+            List<String> uusimmat = new ArrayList(); 
 
             for (int i = 0; i < nakyma.get(2).size(); i++) {
                 String kasiteltava = (String) nakyma.get(2).get(i);
                 if (kasiteltava.length() > 15) {
                     kasiteltava = kasiteltava.substring(0, 15);
+                   
                 }
+                uusimmat.add(kasiteltava);
             }
 
-            data.put("uusimmat", nakyma.get(2));
+            data.put("uusimmat", uusimmat);
 
             return new ModelAndView(data, "index");
         }, new ThymeleafTemplateEngine());

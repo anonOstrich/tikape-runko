@@ -102,9 +102,9 @@ public class Database {
         ArrayList<String> lista = new ArrayList<>();
 
         // tietokantataulujen luomiseen tarvittavat komennot suoritusjärjestyksessä
-        lista.add("DROP TABLE Viesti;");
-        lista.add("DROP TABLE Keskustelunavaus;");
-        lista.add("DROP TABLE Keskustelualue;");
+//        lista.add("DROP TABLE Viesti;");
+//        lista.add("DROP TABLE Keskustelunavaus;");
+//        lista.add("DROP TABLE Keskustelualue;");
         // heroku käyttää SERIAL-avainsanaa uuden tunnuksen automaattiseen luomiseen
         //NOT NULL varmasti käytettävissä???
         lista.add("CREATE TABLE Keskustelualue (id SERIAL PRIMARY KEY, nimi varchar(30) NOT NULL);");

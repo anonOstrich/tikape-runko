@@ -12,7 +12,19 @@ import tikape.runko.domain.Keskustelualue;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        Database database = new Database("jdbc:sqlite:keskustelupalsta.db");
+
+        //postgrekamaa
+        if (System.getenv("PORT") != null) {
+            port(Integer.valueOf(System.getenv("PORT")));
+        }
+
+        String jdbcOsoite = "jdbc:sqlite:keskustelupalsta.db";
+        if (System.getenv("DATABASE_URL") != null) {
+            jdbcOsoite = System.getenv("DATABASE_URL");
+        }
+        //postgrekamaa ends
+        
+        Database database = new Database(jdbcOsoite);
         //database.init();
         KeskustelualueDao keskustelualueDao = new KeskustelualueDao(database);
         KeskustelunavausDao keskustelunavausDao = new KeskustelunavausDao(database);
@@ -72,42 +84,40 @@ public class Main {
 
         //näytettävä sivu, kun luodaan uusi keskustelu alueelle
         get("/alue/:id/lisaa", (req, res) -> {
-            int alue_id = 0; 
-            
-            try{
-                alue_id = Integer.parseInt(req.params(":id"));
-            } catch (Exception e){
-                res.redirect("/");
-                return null; 
-            }
-            
-            HashMap<String, Object> data = new HashMap(); 
-            
-            //Pitäisikö varautua siihen, että osoitteessa on luku joka ei ole minkään alueen id? Esim. virhesivun tuottaminen omalla virheellään. 
-            data.put("alue", keskustelualueDao.findOne(alue_id));
-            
-            
-            
-            return new ModelAndView(data, "avauksenlisays"); 
-        }, new ThymeleafTemplateEngine());
-        
-        post("/alue/:id/lisaa", (req, res) -> {
-            int alue_id = 0; 
+            int alue_id = 0;
+
             try {
                 alue_id = Integer.parseInt(req.params(":id"));
-            } catch(Exception e){
+            } catch (Exception e) {
                 res.redirect("/");
-                return null; 
+                return null;
+            }
+
+            HashMap<String, Object> data = new HashMap();
+
+            //Pitäisikö varautua siihen, että osoitteessa on luku joka ei ole minkään alueen id? Esim. virhesivun tuottaminen omalla virheellään. 
+            data.put("alue", keskustelualueDao.findOne(alue_id));
+
+            return new ModelAndView(data, "avauksenlisays");
+        }, new ThymeleafTemplateEngine());
+
+        post("/alue/:id/lisaa", (req, res) -> {
+            int alue_id = 0;
+            try {
+                alue_id = Integer.parseInt(req.params(":id"));
+            } catch (Exception e) {
+                res.redirect("/");
+                return null;
             }
             String otsikko = req.queryParams("otsikko");
             String sisalto = req.queryParams("sisalto");
             String nimimerkki = req.queryParams("nimimerkki");
-            
-            if (otsikko.trim().isEmpty() || sisalto.trim().isEmpty() || nimimerkki.trim().isEmpty()){
+
+            if (otsikko.trim().isEmpty() || sisalto.trim().isEmpty() || nimimerkki.trim().isEmpty()) {
                 res.redirect("/alue/" + alue_id);
                 // tähän jokin virheviesti. 
             }
-            
+
             //TODO: Lisää tietokantaan nämä tiedot. Ohjaa viestiketjuun (vaiheessa 2 ehkä ko. keskustelualueelle?) 
             //ajatus: max(id) ja transaction saattavat auttaa (pitää lisätä sekä alueeksi että ko. alueelle aloitusviesti)
             //Lisätään keskustelualuetauluun ja viestitauluun
@@ -115,8 +125,8 @@ public class Main {
             //Ensin lisättäisiin keskustelunavaukseen -> SELECT MAX ID, antaa äsken lisätyn id.n
             //
             keskustelunavausDao.createFirstMessage(alue_id, otsikko, sisalto, nimimerkki);
-            res.redirect("/alue/" + alue_id);                     
-            return null; 
+            res.redirect("/alue/" + alue_id);
+            return null;
         });
 
     }

@@ -38,7 +38,7 @@ public class KeskustelunavausDao implements Dao {
         database.update("BEGIN TRANSACTION;");
         database.update("INSERT INTO Keskustelunavaus(keskustelualue, nimi) VALUES (?, ?);",
                 alue_id, avaus_nimi);
-        database.update("INSERT INTO Viesti VALUES((SELECT MAX(id) FROM Keskustelunavaus), ?, ?, datetime('now'));",
+        database.update("INSERT INTO Viesti (keskustelunavaus, sisalto, nimimerkki) VALUES((SELECT MAX(id) FROM Keskustelunavaus), ?, ?);",
                 sisalto, nimimerkki);
         database.update("COMMIT;");
 

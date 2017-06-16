@@ -88,7 +88,7 @@ public class KeskustelualueDao implements Dao<Keskustelualue, Integer> {
     public boolean addNew(Keskustelualue alue) {
         if (alue.getNimi().isEmpty()) return false; 
         try {
-            int muutokset = database.update("INSERT INTO Keskustelualue(nimi) VALUES (?);", alue.getNimi());
+            database.update("INSERT INTO Keskustelualue(nimi) VALUES (?);", alue.getNimi());
             return true; 
         } catch (Exception e) {
             return false;

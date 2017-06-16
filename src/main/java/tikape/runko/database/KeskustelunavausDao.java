@@ -91,6 +91,7 @@ public class KeskustelunavausDao implements Dao<Keskustelunavaus, Integer> {
         PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Keskustelunavaus WHERE id = ?");
         stmt.setInt(1, key);
         ResultSet rs = stmt.executeQuery();
+        rs.next(); 
         int avaus_id = rs.getInt("id");
         String avaus_nimi = rs.getString("nimi");
         int alue_id = rs.getInt("keskustelualue");

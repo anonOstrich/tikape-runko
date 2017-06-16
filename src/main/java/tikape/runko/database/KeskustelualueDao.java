@@ -43,7 +43,7 @@ public class KeskustelualueDao implements Dao<Keskustelualue, Integer> {
                 + "FROM Keskustelualue alue "
                 + "LEFT JOIN Keskustelunavaus avaus ON alue.id = avaus.keskustelualue "
                 + "LEFT JOIN Viesti ON avaus.id = Viesti.keskustelunavaus "
-                + "GROUP BY alue.nimi ORDER BY alue.nimi ASC;";
+                + "GROUP BY alue.id ORDER BY alue.nimi ASC;";
 
         Connection connection = database.getConnection();
         Statement stmt = connection.createStatement();

@@ -55,4 +55,9 @@ public class Viesti {
     public void setKeskustelunavaus(Keskustelunavaus keskustelunavaus) {
         this.keskustelunavaus = keskustelunavaus;
     }   
+    
+    @Override
+    public String toString(){
+        return this.sisalto + " t. " + this.nimimerkki;
+    }
 }

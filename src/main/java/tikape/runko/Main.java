@@ -7,7 +7,10 @@ import spark.template.thymeleaf.ThymeleafTemplateEngine;
 import tikape.runko.database.Database;
 import tikape.runko.database.KeskustelualueDao;
 import tikape.runko.database.KeskustelunavausDao;
+import tikape.runko.database.ViestiDao;
 import tikape.runko.domain.Keskustelualue;
+import tikape.runko.domain.Keskustelunavaus;
+import tikape.runko.domain.Viesti;
 
 public class Main {
 
@@ -23,11 +26,12 @@ public class Main {
             jdbcOsoite = System.getenv("DATABASE_URL");
         }
         //postgrekamaa ends
-        
+
         Database database = new Database(jdbcOsoite);
         //database.init();
         KeskustelualueDao keskustelualueDao = new KeskustelualueDao(database);
-        KeskustelunavausDao keskustelunavausDao = new KeskustelunavausDao(database);
+        KeskustelunavausDao keskustelunavausDao = new KeskustelunavausDao(database, keskustelualueDao);
+        ViestiDao viestiDao = new ViestiDao(database);
 
         get("/", (req, res) -> {
             HashMap<String, Object> data = new HashMap();
@@ -109,6 +113,7 @@ public class Main {
                 res.redirect("/");
                 return null;
             }
+            
             String otsikko = req.queryParams("otsikko");
             String sisalto = req.queryParams("sisalto");
             String nimimerkki = req.queryParams("nimimerkki");
@@ -129,5 +134,49 @@ public class Main {
             return null;
         });
 
+        post("/avaus/:id", (req, res) -> {
+            
+            int avaus_id = 0;
+            
+            try {
+                avaus_id = Integer.parseInt(req.params(":id"));
+            } catch (Exception e) {
+                res.redirect("/");
+                return null;
+            }
+            
+            String sisalto = req.queryParams("sisalto");
+            String nimimerkki = req.queryParams("nimimerkki");
+            
+            if (sisalto.trim().isEmpty() || nimimerkki.trim().isEmpty()) {
+                res.redirect("/avaus/" + avaus_id);
+            }
+            
+            viestiDao.createNewMessage(sisalto, nimimerkki, avaus_id);
+            res.redirect("/avaus/" + avaus_id);
+            
+            return null;
+        });
+
+        get("/avaus/:id", (req, res) -> {
+            HashMap<String, Object> data = new HashMap(); 
+            
+            int avaus_id = 0; 
+            
+            try{
+                avaus_id = Integer.parseInt(req.params(":id"));
+            } catch(Exception e){
+                res.redirect("/");
+            }
+            
+            Keskustelunavaus avaus = keskustelunavausDao.findOne(avaus_id);
+            data.put("avaus", avaus );
+            
+            List<Viesti> viestit = viestiDao.findAllWithAreaId(avaus_id);
+           data.put("viestit", viestit); 
+           
+            
+            return new ModelAndView(data, "viestit");
+        }, new ThymeleafTemplateEngine());
     }
 }

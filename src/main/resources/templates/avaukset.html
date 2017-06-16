@@ -29,7 +29,7 @@
                     <h3>Alue: <span th:text="${alue.nimi}">aluenimi</span></h3>
                     <ul>
                         <li th:each="avaus:${avaukset}" class="listelement">
-                            <span th:text="${avaus}">avauksen nimi</span>
+                            <a th:href="${'/avaus/' + avaus.id}" th:text="${avaus.nimi}">avauksen nimi</a>
                         </li>
                     </ul>
                 </li>

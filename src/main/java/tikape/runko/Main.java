@@ -46,7 +46,7 @@ public class Main {
             for (int i = 0; i < nakyma.get(2).size(); i++) {
                 String kasiteltava = (String) nakyma.get(2).get(i);
                 if (kasiteltava.length() > 15) {
-                    kasiteltava = kasiteltava.substring(0, 15);
+                    kasiteltava = kasiteltava.substring(0, 16);
                    
                 }
                 uusimmat.add(kasiteltava);

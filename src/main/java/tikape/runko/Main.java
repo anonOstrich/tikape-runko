@@ -90,7 +90,6 @@ public class Main {
 
             data.put("avaukset", nakyma.get(0));
             data.put("viestienLukumaarat", nakyma.get(1));
-            //data.put("uusimmat", nakyma.get(2));
 
             List<String> lyhennetytPaivamaarat = new ArrayList(); 
             for (int i = 0; i < nakyma.get(2).size(); i++) {

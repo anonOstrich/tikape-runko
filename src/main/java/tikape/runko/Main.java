@@ -59,7 +59,7 @@ public class Main {
             }
 
             Keskustelualue alue = keskustelualueDao.findOne(id);
-            data.put("aluenimi", alue.getNimi());
+            data.put("alue", alue);
 
             List<List<Object>> nakyma = keskustelunavausDao.createView(id);
 
@@ -69,6 +69,51 @@ public class Main {
 
             return new ModelAndView(data, "avaukset");
         }, new ThymeleafTemplateEngine());
+
+        //näytettävä sivu, kun luodaan uusi keskustelu alueelle
+        get("/alue/:id/lisaa", (req, res) -> {
+            int alue_id = 0; 
+            
+            try{
+                alue_id = Integer.parseInt(req.params(":id"));
+            } catch (Exception e){
+                res.redirect("/");
+                return null; 
+            }
+            
+            HashMap<String, Object> data = new HashMap(); 
+            
+            //Pitäisikö varautua siihen, että osoitteessa on luku joka ei ole minkään alueen id? Esim. virhesivun tuottaminen omalla virheellään. 
+            data.put("alue", keskustelualueDao.findOne(alue_id));
+            
+            
+            
+            return new ModelAndView(data, "avauksenlisays"); 
+        }, new ThymeleafTemplateEngine());
+        
+        post("/alue/:id/lisaa", (req, res) -> {
+            int alue_id = 0; 
+            try {
+                alue_id = Integer.parseInt(req.params(":id"));
+            } catch(Exception e){
+                res.redirect("/");
+                return null; 
+            }
+            String otsikko = req.queryParams("otsikko");
+            String sisalto = req.queryParams("sisalto");
+            
+            if (otsikko.trim().isEmpty() || sisalto.trim().isEmpty()){
+                res.redirect("/");
+            }
+            
+            //TODO: Lisää tietokantaan nämä tiedot. Ohjaa viestiketjuun (vaiheessa 2 ehkä ko. keskustelualueelle?) 
+            //ajatus: max(id) ja transaction saattavat auttaa (pitää lisätä sekä alueeksi että ko. alueelle aloitusviesti)
+            
+            
+            
+            
+            return null; 
+        });
 
     }
 }

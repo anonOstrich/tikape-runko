@@ -1,0 +1,23 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Aloita keskustelu</title>
+        <meta charset="UTF-8" />
+    </head>
+    <body>
+        <div>
+            <!-- Pitäisikö toteuttaa lisää ohjeistusta viestin kirjoittamiseen? Esim. 
+                - montako merkkiä enimmäispituus? Montako vielä jäljellä?
+                + Varmistus ettei voi kirjoittaa suoritettavaa koodia tähän kenttään? Tarvitseeko edes huolehtia? 
+            -->
+            
+            <h1>Alue: <span th:text="${alue.nimi}">sopiva alue</span></h1>
+            <form method="POST">
+                <input type="text" name="otsikko" value="Kirjoita otsikko" /> <br/>
+                <textarea name ="sisalto" rows="20" cols="50"> </textarea><br/>                
+                <input type="submit" value="Luo keskustelu!"/>
+            </form>
+            
+        </div>
+    </body>
+</html>

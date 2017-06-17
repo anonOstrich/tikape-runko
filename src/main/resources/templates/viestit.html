@@ -11,11 +11,13 @@
             <form action="/">
                 <input type="submit" value="Etusivulle"/>
             </form>
+            <a th:href="${ensimmaisenOsoite}">Ensimm&#228;inen sivu</a>
             <a th:href="${seuraavanOsoite}">Seuraava</a>
+            <a th:href="${viimeisenOsoite}">Viimeinen sivu</a>
         </div>
         <h3>Alue: <span th:text="${avaus.keskustelualue.nimi}"></span> &#8594; <span th:text="${avaus.nimi}"></span></h3>
 
-        <ol>
+        <ol th:start="${ylimmanViestinNumero}">
             <li th:each="viesti:${viestit}">
                 <span th:text="${viesti}">Viestisisältö</span>                
             </li>

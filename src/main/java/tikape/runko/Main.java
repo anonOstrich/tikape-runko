@@ -213,7 +213,25 @@ public class Main {
 
             //List<Viesti> viestit = viestiDao.findAllWithAreaId(avaus_id);
             data.put("viestit", viestit);
+            
+            //muodostetaan jo seuraavan viestisivun osoite, jos käyttäjä päättää painaa 'seuraava'-nappia viestisivulla. 
             data.put("seuraavanOsoite", "/avaus/" + avaus_id + "?sivu=" + (naytettavaSivu +1));
+            
+            //muodostetaan myös viimeisen osoite viimeiselle sivulle. Siis sivu, jolla on vielä jonkin verran viestejä näytettävänä. 
+            int viestejaAlueella = viestiDao.montakoViestiaAvauksessa(avaus_id); // haettava tieto
+            int sivujaYhteensa = viestejaAlueella / 20;
+            
+            if (viestejaAlueella % 20 != 0){
+                sivujaYhteensa++; 
+            }
+            
+            data.put("viimeisenOsoite", "/avaus/" + avaus_id + "?sivu=" + sivujaYhteensa);
+            data.put("ensimmaisenOsoite", "/avaus/" + avaus_id);
+            
+            
+            //kerrotaan, mistä numeroinnin pitäisi lähteä (monesko viesti on ensimmäiseksi näytettävä
+            data.put("ylimmanViestinNumero", 20*(naytettavaSivu - 1) + 1 );
+            
             return new ModelAndView(data, "viestit");
         }, new ThymeleafTemplateEngine());
     }

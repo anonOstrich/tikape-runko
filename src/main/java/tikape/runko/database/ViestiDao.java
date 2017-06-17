@@ -45,6 +45,17 @@ public class ViestiDao implements Dao<Viesti, Integer> {
         }
         database.update(query, avaus_id, sisalto, nimimerkki);
     }
+    
+    
+    //jos tulee postgre-ongelmia, hae kaikki viestit ja laske listan koko
+    public int montakoViestiaAvauksessa(int avaus_id) throws SQLException {
+        List<Integer> lkm = database.queryAndCollect("SELECT COUNT(*) AS lukumaara FROM Viesti WHERE keskustelunavaus = ?;", 
+                rs -> rs.getInt("lukumaara"), avaus_id);
+    
+        if (lkm == null) return -1; 
+        return lkm.get(0);
+    }
+    
 
     @Override
     public Viesti findOne(Integer key) throws SQLException {

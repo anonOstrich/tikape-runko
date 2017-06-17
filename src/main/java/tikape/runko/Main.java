@@ -178,7 +178,14 @@ public class Main {
             }
 
             viestiDao.createNewMessage(sisalto, nimimerkki, avaus_id);
-            res.redirect("/avaus/" + avaus_id);
+            int viestejaAlueella = viestiDao.montakoViestiaAvauksessa(avaus_id); // haettava tieto
+            int sivujaYhteensa = viestejaAlueella / 20;
+
+            if (viestejaAlueella % 20 != 0) {
+                sivujaYhteensa++;
+            }
+
+            res.redirect("/avaus/" + avaus_id + "?sivu=" + sivujaYhteensa);
 
             return null;
         });
@@ -226,6 +233,7 @@ public class Main {
             //muodostetaan jo seuraavan viestisivun osoite, 
             //jos käyttäjä päättää painaa 'seuraava'-nappia viestisivulla. 
             data.put("seuraavanOsoite", "/avaus/" + avaus_id + "?sivu=" + (naytettavaSivu + 1));
+            data.put("edellisenOsoite", "/avaus/" + avaus_id + "?sivu=" + (naytettavaSivu - 1));
 
             //muodostetaan myös viimeisen osoite viimeiselle sivulle. 
             //Siis sivu, jolla on vielä jonkin verran viestejä näytettävänä. 
@@ -236,12 +244,24 @@ public class Main {
                 sivujaYhteensa++;
             }
 
+            if (naytettavaSivu > 1) {
+                data.put("edellinen", "Edellinen sivu");
+            }
+            if (naytettavaSivu < sivujaYhteensa) {
+                data.put("seuraava", "Seuraava sivu");
+            }
+
             data.put("viimeisenOsoite", "/avaus/" + avaus_id + "?sivu=" + sivujaYhteensa);
             data.put("ensimmaisenOsoite", "/avaus/" + avaus_id);
 
             //kerrotaan, mistä numeroinnin pitäisi lähteä 
             //(monesko viesti on ensimmäiseksi näytettävä
             data.put("ylimmanViestinNumero", 20 * (naytettavaSivu - 1) + 1);
+
+            //jos yritetään näyttää sivua, joka olisi tyhjä keskusteluista. 
+            if (naytettavaSivu > sivujaYhteensa) {
+                res.redirect("/avaus/" + avaus_id + "?sivu=" + sivujaYhteensa);
+            }
 
             return new ModelAndView(data, "viestit");
         }, new ThymeleafTemplateEngine());

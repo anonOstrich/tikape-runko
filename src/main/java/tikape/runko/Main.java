@@ -16,7 +16,6 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        //postgrekamaa
         if (System.getenv("PORT") != null) {
             port(Integer.valueOf(System.getenv("PORT")));
         }
@@ -25,7 +24,6 @@ public class Main {
         if (System.getenv("DATABASE_URL") != null) {
             jdbcOsoite = System.getenv("DATABASE_URL");
         }
-        //postgrekamaa ends
 
         Database database = new Database(jdbcOsoite);
         //database.init();

@@ -4,25 +4,27 @@
     <head>
         <title>Keskustelupalsta</title>
         <meta charset="UTF-8"/>
-            <style>
-                ul{
-                    list-style:none;
-                    padding:0;
-                }
+        <style>
+            ul{
+                list-style:none;
+                padding:0;
+            }
 
-                .menuelement{display:inline-block;
-                             margin-right: 1em;}
+            .menuelement{display:inline-block;
+                         margin-right: 1em;}
 
-                .listelement{
-                    text-align: left;
-                }
+            .listelement{
+                text-align: left;
+            }
 
-                .buttonelement{
-
-                }
-            </style>
+        </style>
     </head>
     <body>
+        <div>
+            <form action="/">
+                <input type="submit" value="Etusivulle"/>
+            </form>
+        </div>
         <div>
             <ul>
                 <li class = "menuelement">
@@ -54,6 +56,5 @@
         <div>
             <a th:href="${'/alue/' + alue.id + '/lisaa'}">Aloita uusi keskustelu</a>
         </div>
-        
     </body>
 </html>

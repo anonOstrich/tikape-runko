@@ -17,7 +17,6 @@ public class KeskustelunavausDao implements Dao<Keskustelunavaus, Integer> {
         this.keskustelualueDao = keskustelualueDao; 
     }
 
-
     @Override
     public List findAll() throws SQLException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -46,6 +45,9 @@ public class KeskustelunavausDao implements Dao<Keskustelunavaus, Integer> {
                 + "GROUP BY avaus.id "
                 + "ORDER BY Viimeisin_viesti DESC "
                 + "LIMIT 10;";
+        //Ylle kenties jonkinlainen muutos kohtaan LIMIT? Johonkin nappi, näytetäänkö kaikki keskustelut 
+        //vai esimerkiksi 5, 10, 25, 100, tms? ja tämä arvo annetaan metodille parametrina?
+        //(ei käyttäjän syöte)
 
         Connection conn = database.getConnection();
         Statement stmt = conn.createStatement();

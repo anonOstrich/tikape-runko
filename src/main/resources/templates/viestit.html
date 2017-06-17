@@ -4,7 +4,8 @@
     <head>
         <title>Keskustelupalsta</title>
         <meta charset="UTF-8"/>
-
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
     </head>
     <body>
         <div>
@@ -14,14 +15,14 @@
             <form th:action="${'/alue/' + avaus.keskustelualue.id}">
                 <input type="submit" value="Takaisin keskustelualueelle"/>
             </form>
-            
+
             <nav>
 
-            <a th:href="${ensimmaisenOsoite}">Ensimm&#228;inen sivu</a>
-            <a th:href="${edellisenOsoite}"><span th:text="${edellinen}">Edellinen</span></a>
-            <a th:href="${seuraavanOsoite}"><span th:text="${seuraava}">Seuraava</span></a> 
-            <a th:href="${viimeisenOsoite}">Viimeinen sivu</a>
-            
+                <a th:href="${ensimmaisenOsoite}">Ensimm&#228;inen sivu</a>
+                <a th:href="${edellisenOsoite}"><span th:text="${edellinen}">Edellinen</span></a>
+                <a th:href="${seuraavanOsoite}"><span th:text="${seuraava}">Seuraava</span></a> 
+                <a th:href="${viimeisenOsoite}">Viimeinen sivu</a>
+
             </nav>
         </div>
         <h3>Alue: <span th:text="${avaus.keskustelualue.nimi}"></span> &#8594; <span th:text="${avaus.nimi}"></span></h3>
@@ -32,12 +33,18 @@
             </li>
         </ol> 
 
-        <form method="POST">
-            Max. 2000 merkki&#228;:<br/>
-            <textarea maxlength="2000" name ="sisalto" rows="10" cols="50" placeholder="Kirjoita viestisi t&#228;h&#228;n"></textarea><br/>
-            Sy&#246;t&#228; nimimerkki: <br/>
-            <input type="text" name="nimimerkki" /> <br/>
-            <input type="submit" value="L&#228;het&#228; viesti"/>
-        </form>
+        <button class="w3-btn" onclick="document.getElementById('id01').style.display = 'block'">Kirjoita viesti</button>
+
+        <div id="id01" class="w3-panel w3-teal w3-display-container" style="display:none">
+            <form method="POST">
+                Max. 2000 merkki&#228;:<br/>
+                <textarea maxlength="2000" name ="sisalto" rows="10" cols="50" placeholder="Kirjoita viestisi t&#228;h&#228;n"></textarea><br/>
+                Sy&#246;t&#228; nimimerkki: <br/>
+                <input type="text" name="nimimerkki" /> <br/>
+                <input type="submit" value="L&#228;het&#228; viesti"/>
+            </form>
+        </div>
+
+
     </body>
 </html>

@@ -39,13 +39,13 @@ public class Main {
 
             data.put("alueet", nakyma.get(0));
             data.put("viestienLukumaarat", nakyma.get(1));
-            List<String> uusimmat = new ArrayList(); 
+            List<String> uusimmat = new ArrayList();
 
             for (int i = 0; i < nakyma.get(2).size(); i++) {
                 String kasiteltava = (String) nakyma.get(2).get(i);
                 if (kasiteltava.length() > 15) {
                     kasiteltava = kasiteltava.substring(0, 16);
-                   
+
                 }
                 uusimmat.add(kasiteltava);
             }
@@ -92,7 +92,7 @@ public class Main {
             data.put("avaukset", nakyma.get(0));
             data.put("viestienLukumaarat", nakyma.get(1));
 
-            List<String> lyhennetytPaivamaarat = new ArrayList(); 
+            List<String> lyhennetytPaivamaarat = new ArrayList();
             for (int i = 0; i < nakyma.get(2).size(); i++) {
                 String kasiteltava = (String) nakyma.get(2).get(i);
                 if (kasiteltava.length() > 11) {
@@ -100,8 +100,10 @@ public class Main {
                 }
                 lyhennetytPaivamaarat.add(kasiteltava);
             }
-            
-            for(String pvm: lyhennetytPaivamaarat) System.out.println(pvm);
+
+            for (String pvm : lyhennetytPaivamaarat) {
+                System.out.println(pvm);
+            }
 
             data.put("uusimmat", lyhennetytPaivamaarat);
 
@@ -190,10 +192,28 @@ public class Main {
                 res.redirect("/");
             }
 
+            //Selvitetään url-parametrit: onko parametria sivu? JOs ei ole, ohjataan oletuksena
+            //sivulle /?sivu=1, jolloin näytetään ensimmäiset 20 viestiä. 
+            Set<String> urlParams = req.queryParams();
+            if (!urlParams.contains("sivu")) {
+                res.redirect("/avaus/" + avaus_id + "?sivu=1");
+            }
+
+            int naytettavaSivu = -1;
+
+            try {
+                naytettavaSivu = Integer.parseInt(req.queryParams("sivu"));
+            } catch (Exception e) {
+                res.redirect("/");
+            }
+
             Keskustelunavaus avaus = keskustelunavausDao.findOne(avaus_id);
             data.put("avaus", avaus);
+            
+            //yritetään korvata alla oleva kommentoitu metodilla, joka palauttaa vain 20 viestiä halutulta sivulta. 
+            List<Viesti> viestit = viestiDao.find20WithAreaId(avaus_id, naytettavaSivu);
 
-            List<Viesti> viestit = viestiDao.findAllWithAreaId(avaus_id);
+            //List<Viesti> viestit = viestiDao.findAllWithAreaId(avaus_id);
             data.put("viestit", viestit);
 
             return new ModelAndView(data, "viestit");

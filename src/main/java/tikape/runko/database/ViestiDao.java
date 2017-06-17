@@ -19,12 +19,23 @@ public class ViestiDao implements Dao<Viesti, Integer> {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    
+// Käytetäänkö ikinä lopullisessa toteutuksessa? 
     public List<Viesti> findAllWithAreaId(int area_id) throws SQLException {
         return database.queryAndCollect("SELECT * FROM Viesti WHERE keskustelunavaus = ?;",
                 rs -> new Viesti(rs.getString("sisalto"), rs.getString("nimimerkki"), null),
                 area_id);
     }
-
+    
+    public List<Viesti> find20WithAreaId(int area_id, int page) throws SQLException {
+        if (page < 1) page = 1; 
+        int offset = (page - 1) * 20;
+      
+        return database.queryAndCollect("SELECT * FROM Viesti WHERE keskustelunavaus = ? LIMIT 20 OFFSET " + offset + ";",
+                rs -> new Viesti(rs.getString("sisalto"), rs.getString("nimimerkki"), null),
+                area_id); 
+    }
+    
     public void createNewMessage(String sisalto, String nimimerkki, int avaus_id) throws SQLException {
         String query = "";
         if (database.usesPostgres()) {

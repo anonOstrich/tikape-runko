@@ -213,7 +213,7 @@ public class Main {
 
             //List<Viesti> viestit = viestiDao.findAllWithAreaId(avaus_id);
             data.put("viestit", viestit);
-
+            data.put("seuraavanOsoite", "/avaus/" + avaus_id + "?sivu=" + (naytettavaSivu +1));
             return new ModelAndView(data, "viestit");
         }, new ThymeleafTemplateEngine());
     }

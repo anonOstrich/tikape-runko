@@ -19,9 +19,9 @@
 
             <h1>Alue: <span th:text="${alue.nimi}">sopiva alue</span></h1>
             <form method="POST">
-                <input type="text" name="otsikko" value="Kirjoita otsikko" /> <br/><br/>
+                <input type="text" name="otsikko" placeholder="Kirjoita otsikko" /> <br/><br/>
                 Max. 2000 merkki&#228;:<br/>
-                <textarea maxlength ="2000" name ="sisalto" rows="20" cols="50">Kirjoita viestisi sis&#228;lt&#246;</textarea><br/>
+                <textarea maxlength ="2000" name ="sisalto" rows="20" cols="50" placeholder="Kirjoita viestisi sis&#228;lt&#246;"></textarea><br/>
                 Sy&#246;t&#228; nimimerkki: <br/>
                 <input type="text" name="nimimerkki" /> <br/>
                 <input type="submit" value="Luo keskustelu!"/>

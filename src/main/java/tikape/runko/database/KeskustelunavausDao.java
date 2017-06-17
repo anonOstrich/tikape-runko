@@ -103,9 +103,4 @@ public class KeskustelunavausDao implements Dao<Keskustelunavaus, Integer> {
         return new Keskustelunavaus(avaus_id, avaus_nimi, keskustelualue);
     }
 
-    @Override
-    public void delete(Integer key) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
 }

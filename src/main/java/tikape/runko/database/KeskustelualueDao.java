@@ -33,11 +33,6 @@ public class KeskustelualueDao implements Dao<Keskustelualue, Integer> {
                 rs -> new Keskustelualue(rs.getInt("id"), rs.getString("nimi")));
     }
 
-    @Override
-    public void delete(Integer key) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
     public List<List<Object>> createView() throws SQLException {
         String query = "SELECT alue.nimi AS alue, alue.id AS id, COUNT(viesti.sisalto) viestejä, MAX(viesti.aika) viimeisin_viesti "
                 + "FROM Keskustelualue alue "

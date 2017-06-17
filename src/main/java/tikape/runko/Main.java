@@ -27,6 +27,7 @@ public class Main {
 
         Database database = new Database(jdbcOsoite);
         //database.init();
+        //Onko yllä oleva kommenteissa turhaa?
         KeskustelualueDao keskustelualueDao = new KeskustelualueDao(database);
         KeskustelunavausDao keskustelunavausDao = new KeskustelunavausDao(database, keskustelualueDao);
         ViestiDao viestiDao = new ViestiDao(database);
@@ -59,7 +60,6 @@ public class Main {
         post("/", (req, res) -> {
             String nimi = req.queryParams("aluenimi");
 
-            //id:tä ei käytetä tässä; pitäisikö lisätä konstruktori joka ei tarvitse sitä?
             Keskustelualue alue = new Keskustelualue(99, nimi);
             keskustelualueDao.addNew(alue);
 
@@ -73,9 +73,7 @@ public class Main {
         get("/alue/:id", (req, res) -> {
             HashMap<String, Object> data = new HashMap();
 
-            //Halutaan samanlainen näkymä kuin ylempänä, mutta eri tiedoilla??
             int id = 0;
-            //Varmistetaan, että int!! 
 
             try {
                 id = Integer.parseInt(req.params(":id"));
@@ -192,7 +190,7 @@ public class Main {
                 res.redirect("/");
             }
 
-            //Selvitetään url-parametrit: onko parametria sivu? JOs ei ole, ohjataan oletuksena
+            //Selvitetään url-parametrit: onko parametria sivu? Jos ei ole, ohjataan oletuksena
             //sivulle /?sivu=1, jolloin näytetään ensimmäiset 20 viestiä. 
             Set<String> urlParams = req.queryParams();
             if (!urlParams.contains("sivu")) {

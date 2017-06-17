@@ -87,10 +87,6 @@ public class Database {
         Connection conn = getConnection();
         PreparedStatement stmt = conn.prepareStatement(query);
 
-        //DIAGNOSTINEN SOUT
-        System.out.println("Parametrien lkm: " + params.length);
-
-        //POISTA KUN DIAG
         for (int i = 0; i < params.length; i++) {
             System.out.println("Indeksi: " + i);
             stmt.setObject(i + 1, params[i]);
@@ -106,17 +102,14 @@ public class Database {
         ArrayList<String> lista = new ArrayList<>();
 
         // tietokantataulujen luomiseen tarvittavat komennot suoritusjärjestyksessä
-//        lista.add("DROP TABLE Viesti;");
-//        lista.add("DROP TABLE Keskustelunavaus;");
-//        lista.add("DROP TABLE Keskustelualue;");
+        lista.add("DROP TABLE Viesti;");
+        lista.add("DROP TABLE Keskustelunavaus;");
+        lista.add("DROP TABLE Keskustelualue;");
         // heroku käyttää SERIAL-avainsanaa uuden tunnuksen automaattiseen luomiseen
         //NOT NULL varmasti käytettävissä???
         lista.add("CREATE TABLE Keskustelualue (id SERIAL PRIMARY KEY, nimi varchar(30) NOT NULL);");
         lista.add("CREATE TABLE Keskustelunavaus (id SERIAL PRIMARY KEY, keskustelualue int references Keskustelualue (id), nimi varchar(60) NOT NULL);");
         lista.add("CREATE TABLE Viesti (keskustelunavaus int references Keskustelunavaus (id), sisalto varchar(2000) NOT NULL, nimimerkki varchar (20) NOT NULL, aika timestamp DEFAULT now());");
-//        lista.add("INSERT INTO Keskustelualue (nimi) VALUES ('Ohjelmointi');");
-//        lista.add("INSERT INTO Keskustelunavaus (keskustelualue, nimi) VALUES (1, 'Java');");
-//        lista.add("INSERT INTO Viesti (keskustelunavaus, sisalto, nimimerkki) VALUES (1, 'Java on kivaa', 'Javaaja');");
 
         return lista;
     }

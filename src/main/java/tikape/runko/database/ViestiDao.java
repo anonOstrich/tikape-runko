@@ -19,23 +19,24 @@ public class ViestiDao implements Dao<Viesti, Integer> {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    
 // Käytetäänkö ikinä lopullisessa toteutuksessa? 
     public List<Viesti> findAllWithAreaId(int area_id) throws SQLException {
         return database.queryAndCollect("SELECT * FROM Viesti WHERE keskustelunavaus = ?;",
                 rs -> new Viesti(rs.getString("sisalto"), rs.getString("nimimerkki"), null),
                 area_id);
     }
-    
+
     public List<Viesti> find20WithAreaId(int area_id, int page) throws SQLException {
-        if (page < 1) page = 1; 
+        if (page < 1) {
+            page = 1;
+        }
         int offset = (page - 1) * 20;
-      
+
         return database.queryAndCollect("SELECT * FROM Viesti WHERE keskustelunavaus = ? LIMIT 20 OFFSET " + offset + ";",
                 rs -> new Viesti(rs.getString("sisalto"), rs.getString("nimimerkki"), null),
-                area_id); 
+                area_id);
     }
-    
+
     public void createNewMessage(String sisalto, String nimimerkki, int avaus_id) throws SQLException {
         String query = "";
         if (database.usesPostgres()) {
@@ -45,20 +46,29 @@ public class ViestiDao implements Dao<Viesti, Integer> {
         }
         database.update(query, avaus_id, sisalto, nimimerkki);
     }
-    
-    
+
     //jos tulee postgre-ongelmia, hae kaikki viestit ja laske listan koko
     public int montakoViestiaAvauksessa(int avaus_id) throws SQLException {
-        List<Integer> lkm = database.queryAndCollect("SELECT COUNT(*) AS lukumaara FROM Viesti WHERE keskustelunavaus = ?;", 
+        List<Integer> lkm = database.queryAndCollect("SELECT COUNT(*) AS lukumaara FROM Viesti WHERE keskustelunavaus = ?;",
                 rs -> rs.getInt("lukumaara"), avaus_id);
-    
-        if (lkm == null) return -1; 
+
+        if (lkm == null) {
+            return -1;
+        }
         return lkm.get(0);
     }
-    
 
     @Override
     public Viesti findOne(Integer key) throws SQLException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public int montakoSivuaAvauksessa(int avaus_id) throws SQLException {
+        int viestejaAlueella = montakoViestiaAvauksessa(avaus_id);
+        int sivujaYhteensa = viestejaAlueella / 20;
+        if (viestejaAlueella % 20 != 0) {
+            sivujaYhteensa++;
+        }
+        return sivujaYhteensa;
     }
 }

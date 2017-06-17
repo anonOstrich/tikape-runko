@@ -1,16 +1,12 @@
 package tikape.runko;
 
+import java.sql.SQLException;
 import java.util.*;
 import spark.ModelAndView;
 import static spark.Spark.*;
 import spark.template.thymeleaf.ThymeleafTemplateEngine;
-import tikape.runko.database.Database;
-import tikape.runko.database.KeskustelualueDao;
-import tikape.runko.database.KeskustelunavausDao;
-import tikape.runko.database.ViestiDao;
-import tikape.runko.domain.Keskustelualue;
-import tikape.runko.domain.Keskustelunavaus;
-import tikape.runko.domain.Viesti;
+import tikape.runko.database.*;
+import tikape.runko.domain.*;
 
 public class Main {
 
@@ -20,192 +16,174 @@ public class Main {
             port(Integer.valueOf(System.getenv("PORT")));
         }
 
-        String jdbcOsoite = "jdbc:sqlite:keskustelupalsta.db";
-        if (System.getenv("DATABASE_URL") != null) {
-            jdbcOsoite = System.getenv("DATABASE_URL");
-        }
-
-        Database database = new Database(jdbcOsoite);
-        //database.init();
-        //Onko yllä oleva kommenteissa turhaa?
+        Database database = new Database(selvitaJdbcOsoite());
         KeskustelualueDao keskustelualueDao = new KeskustelualueDao(database);
         KeskustelunavausDao keskustelunavausDao = new KeskustelunavausDao(database, keskustelualueDao);
         ViestiDao viestiDao = new ViestiDao(database);
 
-        //hakee juurta, näyttää index-sivun
+        //ALUEIDEN LISTAAMINEN ETUSIVULLA
         get("/", (req, res) -> {
             HashMap<String, Object> data = new HashMap();
-
             List<List<Object>> nakyma = keskustelualueDao.createView();
 
             data.put("alueet", nakyma.get(0));
             data.put("viestienLukumaarat", nakyma.get(1));
-            List<String> uusimmat = new ArrayList();
-
-            for (int i = 0; i < nakyma.get(2).size(); i++) {
-                String kasiteltava = (String) nakyma.get(2).get(i);
-                if (kasiteltava.length() > 15) {
-                    kasiteltava = kasiteltava.substring(0, 16);
-
-                }
-                uusimmat.add(kasiteltava);
-            }
-
-            data.put("uusimmat", uusimmat);
+            data.put("uusimmat", siistiPaivamaarat(nakyma.get(2)));
 
             return new ModelAndView(data, "index");
         }, new ThymeleafTemplateEngine());
 
-        //lisää uuden alueen, päivittää sivun
+        //UUDEN ALUEEN LISÄÄMINEN
         post("/", (req, res) -> {
             String nimi = req.queryParams("aluenimi");
 
             Keskustelualue alue = new Keskustelualue(99, nimi);
-            keskustelualueDao.addNew(alue);
+            boolean onnistui = keskustelualueDao.addNew(alue);
 
-            // TODO: 
-            // jos lisääminen epäonnistuu, tuota virheilmoitus? (oma sivu / indexissä huomautus)
+            if (!onnistui) {
+                return aiheutaVirheViestilla("Alueella tulee olla nimi!");
+            }
+
             res.redirect("/");
-            return "";
-        });
+            return null;
+        }, new ThymeleafTemplateEngine());
 
-        //listaa valitun alueen keskustelut
+        //AVAUSTEN LISTAAMINEN YHDELLÄ ALUEELLA
         get("/alue/:id", (req, res) -> {
             HashMap<String, Object> data = new HashMap();
 
-            int id = 0;
-
-            try {
-                id = Integer.parseInt(req.params(":id"));
-            } catch (Exception e) {
-                data.put("virheviesti", "Alueen id ei ollut kokonaisluku.");
-                return new ModelAndView(data, "error");
+            //luodaan Alue-olio osoitteen perusteella, jos mahdollista
+            int id = muunnaKokonaisluvuksi(req.params(":id"));
+            if (id < 0) {
+                return aiheutaVirheViestilla("Ei kelvollinen alueen tunnus.");
             }
 
             Keskustelualue alue = keskustelualueDao.findOne(id);
+            data.put("alue", alue);
 
             if (alue == null) {
-                data.put("virheviesti", "Haettua keskustelualuetta ei löytynyt.");
-                return new ModelAndView(data, "error");
+                return aiheutaVirheViestilla("Haettua keskustelualuetta ei löytynyt.");
             }
 
+            // selvitetään, halutaanko näkymä rajata kymmeneen viimeisimpänä käytettyyn avaukseen
+            // oletuksena halutaan rajata, joten uudelleenohjataan tähän vaihtoehtoon jos osoite ei sisällä kyseistä
+            // parametria lainkaan. 0 = ei rajoiteta, 1 = rajoitetaan. 
             Set<String> urlParametrit = req.queryParams();
             if (!urlParametrit.contains("rajoita")) {
                 res.redirect("/alue/" + id + "?rajoita=1");
+                return null;
             }
 
-            boolean rajoitus = true;
-
-            try {
-                int rajoiteluku = Integer.parseInt(req.queryParams("rajoita"));
-                rajoitus = (rajoiteluku == 1);
-            } catch (Exception e) {
-                data.put("virheviesti", "");
-                return new ModelAndView(data, "error");
+            int rajoiteluku = muunnaKokonaisluvuksi(req.queryParams("rajoita"));
+            if (rajoiteluku < 0 || rajoiteluku > 1) {
+                return aiheutaVirheViestilla("");
             }
+            boolean rajoitus = (rajoiteluku == 1);
 
-            data.put("alue", alue);
-
+            // tuotetaan näkymän luomista varten tarvittavat tiedot. 
             List<List<Object>> nakyma = keskustelunavausDao.createView(id, rajoitus);
-            
-            int avauksiaAlueella = keskustelunavausDao.montakoAvaustaAlueella(id);
-            
-            System.out.println("AVAUKSIA ALUUELLA: " + avauksiaAlueella);
-            System.out.println("TULOS: " + (avauksiaAlueella - 10));
 
-            //milloin näytetään mahdollisuus näkymän muuttamiseen: 
-            if (!rajoitus) {
-                if (avauksiaAlueella <= 10) {
-                    data.put("toisenNakymanOsoite", "");
-                    data.put("nakymanMuutosTeksti", "");
-                } else {
-                    data.put("toisenNakymanOsoite", "/alue/" + id + "?rajoita=1");
-                    data.put("nakymanMuutosTeksti", "Näytä vähemmän alueita");
-                }
-            } else {
-                if (avauksiaAlueella <= 10) {
-                    data.put("toisenNakymanOsoite", "");
-                    data.put("nakymanMuutosTeksti", "");
-                } else {
-                    data.put("tietoPiilotetuista"," (" + (avauksiaAlueella - 10)  +" vanhinta piilotettu)" );
-                    data.put("toisenNakymanOsoite", "/alue/" + id + "?rajoita=0");
-                    data.put("nakymanMuutosTeksti", "Näytä enemmän alueita");
-                }
-            }
+            // lisätään Thymeleafin käyttöön tarvittavat viestit rajausmoodin vaihtamista varten. Jos joka tapauksessa
+            // korkeintaan 10 avausta, ei tarvetta tarjota vaihtoehtoa. 
+            int avauksiaAlueella = keskustelunavausDao.montakoAvaustaAlueella(id);
+            lisaaOikeatThymeleafMuuttujat(data, rajoitus, avauksiaAlueella, id);
 
             data.put("avaukset", nakyma.get(0));
             data.put("viestienLukumaarat", nakyma.get(1));
-
-            List<String> lyhennetytPaivamaarat = new ArrayList();
-            for (int i = 0; i < nakyma.get(2).size(); i++) {
-                String kasiteltava = (String) nakyma.get(2).get(i);
-                if (kasiteltava.length() > 11) {
-                    kasiteltava = kasiteltava.substring(0, 10);
-                }
-                lyhennetytPaivamaarat.add(kasiteltava);
-            }
-
-            data.put("uusimmat", lyhennetytPaivamaarat);
-
+            data.put("uusimmat", siistiPaivamaarat(nakyma.get(2)));
             return new ModelAndView(data, "avaukset");
         }, new ThymeleafTemplateEngine());
 
-        //näytettävä sivu, kun luodaan uusi keskustelu alueelle
+        //NÄYTETÄÄN SIVU VIESTIN LISÄÄMISELLE
         get("/alue/:id/lisaa", (req, res) -> {
             HashMap<String, Object> data = new HashMap();
-            int alue_id = 0;
-
-            try {
-                alue_id = Integer.parseInt(req.params(":id"));
-            } catch (Exception e) {
-                data.put("virheviesti", "Alueen id ei ollut kokonaisluku.");
-                return new ModelAndView(data, "error");
+            int alue_id = muunnaKokonaisluvuksi(req.params(":id"));
+            if (alue_id < 0) {
+                aiheutaVirheViestilla("Virheellinen aluetunnus");
             }
 
             data.put("alue", keskustelualueDao.findOne(alue_id));
-
             return new ModelAndView(data, "avauksenlisays");
         }, new ThymeleafTemplateEngine());
 
-        //lisää uuden keskustelunavauksen/viestiketjun
+        //LISÄTÄÄN UUSI KESKUSTELUNAVAUS + SEN AVAUSVIESTI
         post("/alue/:id/lisaa", (req, res) -> {
-            int alue_id = 0;
-            try {
-                alue_id = Integer.parseInt(req.params(":id"));
-            } catch (Exception e) {
-                res.redirect("/");
-                return null;
+            // alustetaan map mahdollisia virhetiloja varten
+            HashMap<String, Object> data = new HashMap();
+
+            int alue_id = muunnaKokonaisluvuksi(req.params(":id"));
+            if (alue_id < 0) {
+                aiheutaVirheViestilla("Virheellinen aluetunnus");
             }
 
             String otsikko = req.queryParams("otsikko");
             String sisalto = req.queryParams("sisalto");
             String nimimerkki = req.queryParams("nimimerkki");
-                       
-            if (otsikko.trim().isEmpty() || sisalto.trim().isEmpty() || nimimerkki.trim().isEmpty()) {
-                
 
-                HashMap<String, Object> data = new HashMap(); 
-                data.put("virheviesti", "VIRHE");
-                return new ModelAndView(data, "error"); 
+            if (otsikko.trim().isEmpty() || sisalto.trim().isEmpty() || nimimerkki.trim().isEmpty()) {
+                return aiheutaVirheViestilla("Et täyttänyt kaikkia pakollisia kenttiä.");
             }
 
-            //luo viestin ja palauttaa viestiä vastaavan avauksen id:n
+            //Luodaan avaus ja viesti.  Palautetaan viestiä vastaavan avauksen id
             int avaus_id = keskustelunavausDao.createFirstMessage(alue_id, otsikko, sisalto, nimimerkki);
             res.redirect("/avaus/" + avaus_id);
-
             return null;
         }, new ThymeleafTemplateEngine());
 
-        //lisää avattuun viestiketjuun uuden viestin
+        // NÄYTETÄÄN AVAUKSEN VIESTIT
+        get("/avaus/:id", (req, res) -> {
+            HashMap<String, Object> data = new HashMap();
+
+            int avaus_id = muunnaKokonaisluvuksi(req.params(":id"));
+            if (avaus_id < 0) {
+                return aiheutaVirheViestilla("Virheellinen avaustunnus");
+            }
+
+            // Selvitetään parametrin sivu arvo. Jos parametriä ei ole osoitteessa, uudelleenohjataan sivulle jossa sivu=1.
+            // Yhdellä sivulla näytetään korkeintaan 20 vuotta. 
+            Set<String> urlParams = req.queryParams();
+            if (!urlParams.contains("sivu")) {
+                res.redirect("/avaus/" + avaus_id + "?sivu=1");
+                return null;
+            }
+
+            int naytettavaSivu = muunnaKokonaisluvuksi(req.queryParams("sivu"));
+            if (naytettavaSivu <= 0) {
+                return aiheutaVirheViestilla("Virheellinen sivunumero");
+            }
+
+            Keskustelunavaus avaus = keskustelunavausDao.findOne(avaus_id);
+            if (avaus == null) {
+                return aiheutaVirheViestilla("Haettua viestiketjua ei löytynyt");
+            }
+            data.put("avaus", avaus);
+
+            // haetaan halutut max 20 viestiä. 
+            List<Viesti> viestit = viestiDao.find20WithAreaId(avaus_id, naytettavaSivu);
+            data.put("viestit", viestit);
+
+            int sivujaYhteensa = viestiDao.montakoSivuaAvauksessa(avaus_id);
+            System.out.println();
+            lisaaTiedotSelauslinkeille(data, sivujaYhteensa, avaus_id, naytettavaSivu);
+
+            //Ei näytetä sivua, jonka numero on korkeampi kuin suurimman sivun. Ohjataan viimeiselle sivulle. 
+            if (naytettavaSivu > sivujaYhteensa) {
+                res.redirect("/avaus/" + avaus_id + "?sivu=" + sivujaYhteensa);
+                return null;
+            }
+
+            // Numeroidaan viestit oikein (jotta esim. toisen sivun ensimmäinen viesti on 21, ei 1)
+            data.put("ylimmanViestinNumero", 20 * (naytettavaSivu - 1) + 1);
+
+            return new ModelAndView(data, "viestit");
+        }, new ThymeleafTemplateEngine());
+
+        // LISÄTÄÄN UUSI VIESTI AVAUKSEEN
         post("/avaus/:id", (req, res) -> {
 
-            int avaus_id = 0;
-
-            try {
-                avaus_id = Integer.parseInt(req.params(":id"));
-            } catch (Exception e) {
-                res.redirect("/");
-                return null;
+            int avaus_id = muunnaKokonaisluvuksi(req.params(":id"));
+            if (avaus_id < 0) {
+                return aiheutaVirheViestilla("");
             }
 
             String sisalto = req.queryParams("sisalto");
@@ -213,95 +191,90 @@ public class Main {
 
             if (sisalto.trim().isEmpty() || nimimerkki.trim().isEmpty()) {
                 res.redirect("/avaus/" + avaus_id);
+                return aiheutaVirheViestilla("");
             }
 
+            // lisätään viesti ja uudelleenohjataan avauksen viimeiselle sivulle, 
+            // jotta juuri lisätty viesti näkyy varmasti. 
             viestiDao.createNewMessage(sisalto, nimimerkki, avaus_id);
-            int viestejaAlueella = viestiDao.montakoViestiaAvauksessa(avaus_id); // haettava tieto
-            int sivujaYhteensa = viestejaAlueella / 20;
-
-            if (viestejaAlueella % 20 != 0) {
-                sivujaYhteensa++;
-            }
-
-            res.redirect("/avaus/" + avaus_id + "?sivu=" + sivujaYhteensa);
-
+            int viimeinenSivu = viestiDao.montakoSivuaAvauksessa(avaus_id);
+            res.redirect("/avaus/" + avaus_id + "?sivu=" + viimeinenSivu);
             return null;
-        });
-
-        //hakee valitun viestiketjun
-        get("/avaus/:id", (req, res) -> {
-            HashMap<String, Object> data = new HashMap();
-
-            int avaus_id = 0;
-
-            try {
-                avaus_id = Integer.parseInt(req.params(":id"));
-            } catch (Exception e) {
-                res.redirect("/");
-            }
-
-            //Selvitetään url-parametrit: onko parametria sivu? Jos ei ole, ohjataan oletuksena
-            //sivulle /?sivu=1, jolloin näytetään ensimmäiset 20 viestiä. 
-            Set<String> urlParams = req.queryParams();
-            if (!urlParams.contains("sivu")) {
-                res.redirect("/avaus/" + avaus_id + "?sivu=1");
-            }
-
-            int naytettavaSivu = -1;
-
-            try {
-                naytettavaSivu = Integer.parseInt(req.queryParams("sivu"));
-            } catch (Exception e) {
-                data.put("virheviesti", "");
-                return new ModelAndView(data, "error");
-            }
-
-            Keskustelunavaus avaus = keskustelunavausDao.findOne(avaus_id);
-
-            if (avaus == null) {
-                data.put("virheviesti", "Haettua viestiketjua ei löytynyt.");
-                return new ModelAndView(data, "error");
-            }
-
-            data.put("avaus", avaus);
-
-            List<Viesti> viestit = viestiDao.find20WithAreaId(avaus_id, naytettavaSivu);
-            data.put("viestit", viestit);
-
-            //muodostetaan jo seuraavan viestisivun osoite, 
-            //jos käyttäjä päättää painaa 'seuraava'-nappia viestisivulla. 
-            data.put("seuraavanOsoite", "/avaus/" + avaus_id + "?sivu=" + (naytettavaSivu + 1));
-            data.put("edellisenOsoite", "/avaus/" + avaus_id + "?sivu=" + (naytettavaSivu - 1));
-
-            //muodostetaan myös viimeisen osoite viimeiselle sivulle. 
-            //Siis sivu, jolla on vielä jonkin verran viestejä näytettävänä. 
-            int viestejaAlueella = viestiDao.montakoViestiaAvauksessa(avaus_id); // haettava tieto
-            int sivujaYhteensa = viestejaAlueella / 20;
-
-            if (viestejaAlueella % 20 != 0) {
-                sivujaYhteensa++;
-            }
-
-            if (naytettavaSivu > 1) {
-                data.put("edellinen", "Edellinen sivu");
-            }
-            if (naytettavaSivu < sivujaYhteensa) {
-                data.put("seuraava", "Seuraava sivu");
-            }
-
-            data.put("viimeisenOsoite", "/avaus/" + avaus_id + "?sivu=" + sivujaYhteensa);
-            data.put("ensimmaisenOsoite", "/avaus/" + avaus_id);
-
-            //kerrotaan, mistä numeroinnin pitäisi lähteä 
-            //(monesko viesti on ensimmäiseksi näytettävä
-            data.put("ylimmanViestinNumero", 20 * (naytettavaSivu - 1) + 1);
-
-            //jos yritetään näyttää sivua, joka olisi tyhjä keskusteluista. 
-            if (naytettavaSivu > sivujaYhteensa) {
-                res.redirect("/avaus/" + avaus_id + "?sivu=" + sivujaYhteensa);
-            }
-
-            return new ModelAndView(data, "viestit");
         }, new ThymeleafTemplateEngine());
     }
+
+    public static List<String> siistiPaivamaarat(List<Object> lista) {
+        List<String> palautettava = new ArrayList();
+
+        for (int i = 0; i < lista.size(); i++) {
+            String kasiteltava = (String) lista.get(i);
+            if (kasiteltava.length() > 15) {
+                kasiteltava = kasiteltava.substring(0, 16);
+            }
+            palautettava.add(kasiteltava);
+        }
+
+        return palautettava;
+    }
+
+    public static String selvitaJdbcOsoite() {
+        if (System.getenv("DATABASE_URL") != null) {
+            return System.getenv("DATABASE_URL");
+        }
+        return "jdbc:sqlite:keskustelupalsta.db";
+    }
+
+    public static int muunnaKokonaisluvuksi(String mjono) {
+        try {
+            return Integer.parseInt(mjono);
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    public static void lisaaOikeatThymeleafMuuttujat(HashMap<String, Object> data, boolean rajoitus, int avauksiaAlueella, int alue_id) {
+        if (!rajoitus) {
+            if (avauksiaAlueella <= 10) {
+                data.put("toisenNakymanOsoite", "");
+                data.put("nakymanMuutosTeksti", "");
+            } else {
+                data.put("toisenNakymanOsoite", "/alue/" + alue_id + "?rajoita=1");
+                data.put("nakymanMuutosTeksti", "Näytä vähemmän alueita");
+            }
+        } else {
+            if (avauksiaAlueella <= 10) {
+                data.put("toisenNakymanOsoite", "");
+                data.put("nakymanMuutosTeksti", "");
+            } else {
+                data.put("tietoPiilotetuista", " (" + (avauksiaAlueella - 10) + " vanhinta piilotettu)");
+                data.put("toisenNakymanOsoite", "/alue/" + alue_id + "?rajoita=0");
+                data.put("nakymanMuutosTeksti", "Näytä enemmän alueita");
+            }
+        }
+
+    }
+
+    public static void lisaaTiedotSelauslinkeille(HashMap<String, Object> data, int sivujaYhteensa, int avaus_id, int naytettavaSivu) {
+
+        // linkit edelliseen ja seuraavaan sivuun vain jos tällaisia oikeasti on näyttää
+        if (naytettavaSivu > 1) {
+            data.put("edellinen", "Edellinen sivu");
+            data.put("edellisenOsoite", "/avaus/" + avaus_id + "?sivu=" + (naytettavaSivu - 1));
+        }
+        if (naytettavaSivu < sivujaYhteensa) {
+            data.put("seuraava", "Seuraava sivu");
+            data.put("seuraavanOsoite", "/avaus/" + avaus_id + "?sivu=" + (naytettavaSivu + 1));
+        }
+
+        //viimeiselle ja ensimmäiselle aina linkit, vaikka oltaisiin jo. 
+        data.put("viimeisenOsoite", "/avaus/" + avaus_id + "?sivu=" + sivujaYhteensa);
+        data.put("ensimmaisenOsoite", "/avaus/" + avaus_id);
+    }
+
+    public static ModelAndView aiheutaVirheViestilla(String viesti) {
+        HashMap<String, Object> data = new HashMap();
+        data.put("virheviesti", viesti);
+        return new ModelAndView(data, "error");
+    }
+
 }

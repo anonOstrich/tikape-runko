@@ -109,6 +109,9 @@ public class Main {
             List<List<Object>> nakyma = keskustelunavausDao.createView(id, rajoitus);
             
             int avauksiaAlueella = keskustelunavausDao.montakoAvaustaAlueella(id);
+            
+            System.out.println("AVAUKSIA ALUUELLA: " + avauksiaAlueella);
+            System.out.println("TULOS: " + (avauksiaAlueella - 10));
 
             //milloin näytetään mahdollisuus näkymän muuttamiseen: 
             if (!rajoitus) {
@@ -177,10 +180,13 @@ public class Main {
             String otsikko = req.queryParams("otsikko");
             String sisalto = req.queryParams("sisalto");
             String nimimerkki = req.queryParams("nimimerkki");
-
+                       
             if (otsikko.trim().isEmpty() || sisalto.trim().isEmpty() || nimimerkki.trim().isEmpty()) {
-                res.redirect("/alue/" + alue_id);
-                // tähän jokin virheviesti. 
+                
+
+                HashMap<String, Object> data = new HashMap(); 
+                data.put("virheviesti", "VIRHE");
+                return new ModelAndView(data, "error"); 
             }
 
             //luo viestin ja palauttaa viestiä vastaavan avauksen id:n
@@ -188,7 +194,7 @@ public class Main {
             res.redirect("/avaus/" + avaus_id);
 
             return null;
-        });
+        }, new ThymeleafTemplateEngine());
 
         //lisää avattuun viestiketjuun uuden viestin
         post("/avaus/:id", (req, res) -> {

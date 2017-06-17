@@ -78,11 +78,17 @@ public class Main {
             try {
                 id = Integer.parseInt(req.params(":id"));
             } catch (Exception e) {
-                res.redirect("/");
-                return null;
+                data.put("virheviesti", "Alueen id ei ollut kokonaisluku.");
+                return new ModelAndView(data, "error");
             }
 
             Keskustelualue alue = keskustelualueDao.findOne(id);
+
+            if (alue == null) {
+                data.put("virheviesti", "Haettua keskustelualuetta ei löytynyt.");
+                return new ModelAndView(data, "error");
+            }
+
             data.put("alue", alue);
 
             List<List<Object>> nakyma = keskustelunavausDao.createView(id);
@@ -99,6 +105,7 @@ public class Main {
                 lyhennetytPaivamaarat.add(kasiteltava);
             }
 
+            //Diagnostillinen soutti -> poista?
             for (String pvm : lyhennetytPaivamaarat) {
                 System.out.println(pvm);
             }
@@ -110,18 +117,16 @@ public class Main {
 
         //näytettävä sivu, kun luodaan uusi keskustelu alueelle
         get("/alue/:id/lisaa", (req, res) -> {
+            HashMap<String, Object> data = new HashMap();
             int alue_id = 0;
 
             try {
                 alue_id = Integer.parseInt(req.params(":id"));
             } catch (Exception e) {
-                res.redirect("/");
-                return null;
+                data.put("virheviesti", "Alueen id ei ollut kokonaisluku.");
+                return new ModelAndView(data, "error");
             }
 
-            HashMap<String, Object> data = new HashMap();
-
-            //Pitäisikö varautua siihen, että osoitteessa on luku joka ei ole minkään alueen id? Esim. virhesivun tuottaminen omalla virheellään. 
             data.put("alue", keskustelualueDao.findOne(alue_id));
 
             return new ModelAndView(data, "avauksenlisays");
@@ -202,36 +207,42 @@ public class Main {
             try {
                 naytettavaSivu = Integer.parseInt(req.queryParams("sivu"));
             } catch (Exception e) {
-                res.redirect("/");
+                data.put("virheviesti", "");
+                return new ModelAndView(data, "error");
             }
 
             Keskustelunavaus avaus = keskustelunavausDao.findOne(avaus_id);
-            data.put("avaus", avaus);
-            
-            //yritetään korvata alla oleva kommentoitu metodilla, joka palauttaa vain 20 viestiä halutulta sivulta. 
-            List<Viesti> viestit = viestiDao.find20WithAreaId(avaus_id, naytettavaSivu);
 
-            //List<Viesti> viestit = viestiDao.findAllWithAreaId(avaus_id);
+            if (avaus == null) {
+                data.put("virheviesti", "Haettua viestiketjua ei löytynyt.");
+                return new ModelAndView(data, "error");
+            }
+
+            data.put("avaus", avaus);
+
+            List<Viesti> viestit = viestiDao.find20WithAreaId(avaus_id, naytettavaSivu);
             data.put("viestit", viestit);
-            
-            //muodostetaan jo seuraavan viestisivun osoite, jos käyttäjä päättää painaa 'seuraava'-nappia viestisivulla. 
-            data.put("seuraavanOsoite", "/avaus/" + avaus_id + "?sivu=" + (naytettavaSivu +1));
-            
-            //muodostetaan myös viimeisen osoite viimeiselle sivulle. Siis sivu, jolla on vielä jonkin verran viestejä näytettävänä. 
+
+            //muodostetaan jo seuraavan viestisivun osoite, 
+            //jos käyttäjä päättää painaa 'seuraava'-nappia viestisivulla. 
+            data.put("seuraavanOsoite", "/avaus/" + avaus_id + "?sivu=" + (naytettavaSivu + 1));
+
+            //muodostetaan myös viimeisen osoite viimeiselle sivulle. 
+            //Siis sivu, jolla on vielä jonkin verran viestejä näytettävänä. 
             int viestejaAlueella = viestiDao.montakoViestiaAvauksessa(avaus_id); // haettava tieto
             int sivujaYhteensa = viestejaAlueella / 20;
-            
-            if (viestejaAlueella % 20 != 0){
-                sivujaYhteensa++; 
+
+            if (viestejaAlueella % 20 != 0) {
+                sivujaYhteensa++;
             }
-            
+
             data.put("viimeisenOsoite", "/avaus/" + avaus_id + "?sivu=" + sivujaYhteensa);
             data.put("ensimmaisenOsoite", "/avaus/" + avaus_id);
-            
-            
-            //kerrotaan, mistä numeroinnin pitäisi lähteä (monesko viesti on ensimmäiseksi näytettävä
-            data.put("ylimmanViestinNumero", 20*(naytettavaSivu - 1) + 1 );
-            
+
+            //kerrotaan, mistä numeroinnin pitäisi lähteä 
+            //(monesko viesti on ensimmäiseksi näytettävä
+            data.put("ylimmanViestinNumero", 20 * (naytettavaSivu - 1) + 1);
+
             return new ModelAndView(data, "viestit");
         }, new ThymeleafTemplateEngine());
     }

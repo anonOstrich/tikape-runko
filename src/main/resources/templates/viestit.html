@@ -13,16 +13,16 @@
             </form>
             <form th:action="${'/alue/' + avaus.keskustelualue.id}">
                 <input type="submit" value="Takaisin keskustelualueelle"/>
-            </form>   
+            </form>
+            
+            <nav>
 
             <a th:href="${ensimmaisenOsoite}">Ensimm&#228;inen sivu</a>
-
             <a th:href="${edellisenOsoite}"><span th:text="${edellinen}">Edellinen</span></a>
-
             <a th:href="${seuraavanOsoite}"><span th:text="${seuraava}">Seuraava</span></a> 
-
-
             <a th:href="${viimeisenOsoite}">Viimeinen sivu</a>
+            
+            </nav>
         </div>
         <h3>Alue: <span th:text="${avaus.keskustelualue.nimi}"></span> &#8594; <span th:text="${avaus.nimi}"></span></h3>
 

@@ -52,6 +52,8 @@
                     </ul>
                 </li>
             </ul>
+            
+            <a th:href="${toisenNakymanOsoite}"><span th:text="${nakymanMuutosTeksti}"></span></a><span th:text="${tietoPiilotetuista}"></span>
         </div>
         <div>
             <a th:href="${'/alue/' + alue.id + '/lisaa'}">Aloita uusi keskustelu</a>

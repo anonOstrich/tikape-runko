@@ -89,9 +89,46 @@ public class Main {
                 return new ModelAndView(data, "error");
             }
 
+            Set<String> urlParametrit = req.queryParams();
+            if (!urlParametrit.contains("rajoita")) {
+                res.redirect("/alue/" + id + "?rajoita=1");
+            }
+
+            boolean rajoitus = true;
+
+            try {
+                int rajoiteluku = Integer.parseInt(req.queryParams("rajoita"));
+                rajoitus = (rajoiteluku == 1);
+            } catch (Exception e) {
+                data.put("virheviesti", "");
+                return new ModelAndView(data, "error");
+            }
+
             data.put("alue", alue);
 
-            List<List<Object>> nakyma = keskustelunavausDao.createView(id);
+            List<List<Object>> nakyma = keskustelunavausDao.createView(id, rajoitus);
+            
+            int avauksiaAlueella = keskustelunavausDao.montakoAvaustaAlueella(id);
+
+            //milloin näytetään mahdollisuus näkymän muuttamiseen: 
+            if (!rajoitus) {
+                if (avauksiaAlueella <= 10) {
+                    data.put("toisenNakymanOsoite", "");
+                    data.put("nakymanMuutosTeksti", "");
+                } else {
+                    data.put("toisenNakymanOsoite", "/alue/" + id + "?rajoita=1");
+                    data.put("nakymanMuutosTeksti", "Näytä vähemmän alueita");
+                }
+            } else {
+                if (avauksiaAlueella <= 10) {
+                    data.put("toisenNakymanOsoite", "");
+                    data.put("nakymanMuutosTeksti", "");
+                } else {
+                    data.put("tietoPiilotetuista"," (" + (avauksiaAlueella - 10)  +" vanhinta piilotettu)" );
+                    data.put("toisenNakymanOsoite", "/alue/" + id + "?rajoita=0");
+                    data.put("nakymanMuutosTeksti", "Näytä enemmän alueita");
+                }
+            }
 
             data.put("avaukset", nakyma.get(0));
             data.put("viestienLukumaarat", nakyma.get(1));
@@ -103,11 +140,6 @@ public class Main {
                     kasiteltava = kasiteltava.substring(0, 10);
                 }
                 lyhennetytPaivamaarat.add(kasiteltava);
-            }
-
-            //Diagnostillinen soutti -> poista?
-            for (String pvm : lyhennetytPaivamaarat) {
-                System.out.println(pvm);
             }
 
             data.put("uusimmat", lyhennetytPaivamaarat);

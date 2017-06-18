@@ -12,13 +12,13 @@ public class ViestiDao implements Dao<Viesti, Integer> {
         this.database = database;
     }
 
-    public List<Viesti> find20WithAreaId(int area_id, int page) throws SQLException {
+    public List<Viesti> findkWithAreaId(int area_id,int k,  int page) throws SQLException {
         if (page < 1) {
             page = 1;
         }
-        int offset = (page - 1) * 20;
+        int offset = (page - 1) * k;
 
-        return database.queryAndCollect("SELECT * FROM Viesti WHERE keskustelunavaus = ? LIMIT 20 OFFSET " + offset + ";",
+        return database.queryAndCollect("SELECT * FROM Viesti WHERE keskustelunavaus = ? LIMIT " + k + " OFFSET " + offset + ";",
                 rs -> new Viesti(rs.getString("sisalto"), rs.getString("nimimerkki"), null),
                 area_id);
     }
@@ -43,10 +43,10 @@ public class ViestiDao implements Dao<Viesti, Integer> {
         return lkm.get(0);
     }
 
-    public int montakoSivuaAvauksessa(int avaus_id) throws SQLException {
+    public int montakoSivuaAvauksessa(int avaus_id, int k) throws SQLException {
         int viestejaAlueella = montakoViestiaAvauksessa(avaus_id);
-        int sivujaYhteensa = viestejaAlueella / 20;
-        if (viestejaAlueella % 20 != 0) {
+        int sivujaYhteensa = viestejaAlueella / k;
+        if (viestejaAlueella % k != 0) {
             sivujaYhteensa++;
         }
         return sivujaYhteensa;

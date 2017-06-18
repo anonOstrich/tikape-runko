@@ -8,8 +8,11 @@ import tikape.runko.database.*;
 import tikape.runko.domain.*;
 
 public class Main {
+    
+    public static int viestejaSivulla; 
 
     public static void main(String[] args) throws Exception {
+        viestejaSivulla = 10; 
 
         if (System.getenv("PORT") != null) {
             port(Integer.valueOf(System.getenv("PORT")));
@@ -92,6 +95,11 @@ public class Main {
             data.put("uusimmat", siistiPaivamaarat(nakyma.get(2)));
             return new ModelAndView(data, "avaukset");
         }, new ThymeleafTemplateEngine());
+        
+        get("alue/:id/", (req, res) -> {
+           res.redirect("/alue/" + req.params(":id"));
+           return aiheutaVirheViestilla("");
+        });
 
         //NÄYTETÄÄN SIVU VIESTIN LISÄÄMISELLE
         get("/alue/:id/lisaa", (req, res) -> {
@@ -157,11 +165,11 @@ public class Main {
             }
             data.put("avaus", avaus);
 
-            // haetaan halutut max 20 viestiä. 
-            List<Viesti> viestit = viestiDao.find20WithAreaId(avaus_id, naytettavaSivu);
+            // haetaan halutut max viestejaSivulla viestiä. 
+            List<Viesti> viestit = viestiDao.findkWithAreaId(avaus_id, viestejaSivulla, naytettavaSivu);
             data.put("viestit", viestit);
 
-            int sivujaYhteensa = viestiDao.montakoSivuaAvauksessa(avaus_id);
+            int sivujaYhteensa = viestiDao.montakoSivuaAvauksessa(avaus_id, viestejaSivulla);
             System.out.println();
             lisaaTiedotSelauslinkeille(data, sivujaYhteensa, avaus_id, naytettavaSivu);
 
@@ -171,11 +179,16 @@ public class Main {
                 return null;
             }
 
-            // Numeroidaan viestit oikein (jotta esim. toisen sivun ensimmäinen viesti on 21, ei 1)
-            data.put("ylimmanViestinNumero", 20 * (naytettavaSivu - 1) + 1);
+            // Numeroidaan viestit oikein 
+            data.put("ylimmanViestinNumero", viestejaSivulla * (naytettavaSivu - 1) + 1);
 
             return new ModelAndView(data, "viestit");
         }, new ThymeleafTemplateEngine());
+        
+        get("/avaus/:id/", (req, res) -> {
+            res.redirect("/avaus/" + req.params(":id"));
+           return aiheutaVirheViestilla(""); 
+        });
 
         // LISÄTÄÄN UUSI VIESTI AVAUKSEEN
         post("/avaus/:id", (req, res) -> {
@@ -196,7 +209,7 @@ public class Main {
             // lisätään viesti ja uudelleenohjataan avauksen viimeiselle sivulle, 
             // jotta juuri lisätty viesti näkyy varmasti. 
             viestiDao.createNewMessage(sisalto, nimimerkki, avaus_id);
-            int viimeinenSivu = viestiDao.montakoSivuaAvauksessa(avaus_id);
+            int viimeinenSivu = viestiDao.montakoSivuaAvauksessa(avaus_id, viestejaSivulla);
             res.redirect("/avaus/" + avaus_id + "?sivu=" + viimeinenSivu);
             return null;
         }, new ThymeleafTemplateEngine());
@@ -238,16 +251,16 @@ public class Main {
                 data.put("nakymanMuutosTeksti", "");
             } else {
                 data.put("toisenNakymanOsoite", "/alue/" + alue_id + "?rajoita=1");
-                data.put("nakymanMuutosTeksti", "Näytä vähemmän alueita");
+                data.put("nakymanMuutosTeksti", "Piilota");
             }
         } else {
             if (avauksiaAlueella <= 10) {
                 data.put("toisenNakymanOsoite", "");
                 data.put("nakymanMuutosTeksti", "");
             } else {
-                data.put("tietoPiilotetuista", " (" + (avauksiaAlueella - 10) + " vanhinta piilotettu)");
+                data.put("tietoPiilotetuista", "..." + (avauksiaAlueella - 10) + " muuta ");
                 data.put("toisenNakymanOsoite", "/alue/" + alue_id + "?rajoita=0");
-                data.put("nakymanMuutosTeksti", "Näytä enemmän alueita");
+                data.put("nakymanMuutosTeksti", "Näytä");
             }
         }
 

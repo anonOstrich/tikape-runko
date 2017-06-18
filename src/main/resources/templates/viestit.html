@@ -10,7 +10,21 @@
             #hidden{
                 display:none; 
             }
+            
+            li p{
+                width: 50%;                                   
+            }
         </style>
+        <script>
+            function toggleNakyma() {
+                if (document.getElementById('id01').style.display == 'block') {
+                    document.getElementById('id01').style.display = 'none';
+
+                } else {
+                    document.getElementById('id01').style.display = 'block'
+                }
+            }
+        </script>
 
     </head>
     <body class="w3-light-gray">
@@ -29,16 +43,19 @@
                 </span> &#8594; <span th:text="${avaus.nimi}"></span></h3>
         </div>
 
-        <div class="w3-container">
-        <ol th:start="${ylimmanViestinNumero}" >
-            <li th:each="viesti:${viestit}">
-                <span th:text="${viesti}">Viestisisältö</span>                
-            </li>
-        </ol> 
+        <div class="w3-container w3-mobile">
+            <ol th:start="${ylimmanViestinNumero}" >
+                <li th:each="viesti:${viestit}" >
+                    <p th:text="${viesti}">Viestisisältö</p>               
+                </li>
+            </ol> 
         </div>
-        <button class="w3-btn" onclick="document.getElementById('id01').style.display = 'block'">Kirjoita viesti</button>
+        
+        <div class="w3-container">
+            <input type="button" value="Kirjoita viesti" onclick="toggleNakyma();" />
+        </div>
 
-        <div id="id01" class="w3-panel w3-teal w3-display-container" style="display:none">
+        <div id="id01" class="w3-panel w3-light-gray w3-display-container" style="display:none">
             <form method="POST">
                 Max. 2000 merkki&#228;:<br/>
                 <textarea maxlength="2000" name ="sisalto" rows="10" cols="50" placeholder="Kirjoita viestisi t&#228;h&#228;n (pakollinen)"></textarea><br/>

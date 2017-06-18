@@ -6,11 +6,17 @@
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <style>
-            a:hover{
+            li a:hover, div a:hover{
                 color: rgb(160, 160, 160);
+                font-style: italic;
+            }
+
+            a {
                 text-decoration: none; 
             }
-            
+
+
+
             ul{
                 list-style:none;
                 padding:0;
@@ -58,9 +64,12 @@
                     </ul>
                 </li>
             </ul>
-
-            <a th:href="${toisenNakymanOsoite}"><span th:text="${nakymanMuutosTeksti}"></span></a><span th:text="${tietoPiilotetuista}"></span>
         </div>
+
+        <div class="w3-container">
+            <span th:text="${tietoPiilotetuista}"></span><a th:href="${toisenNakymanOsoite}"><span th:text="${nakymanMuutosTeksti}"></span></a>
+        </div>
+
         <div class="w3-container">
             <a th:href="${'/alue/' + alue.id + '/lisaa'}">Aloita uusi keskustelu</a>
         </div>

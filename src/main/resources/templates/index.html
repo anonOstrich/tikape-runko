@@ -20,16 +20,24 @@
                 text-align: left;
             }
 
+            li a {
+                text-decoration: none; 
+            }
+            li a:hover{
+                color: rgb(160, 160, 160);
+                font-style: italic;
+            }
+
         </style>
     </head>
 
     <body class="w3-light-gray">
         <nav class="w3-bar w3-black">               
-            <a href="/" class ="w3-bar-item w3-button">Etusivulle</a>
+            <a href="/" class ="w3-bar-item w3-button">Etusivu</a>
         </nav>
 
 
-        <div>
+        <div class="w3-container">
             <ul>
                 <li class = "menuelement">
                     <h3>Alue</h3>
@@ -58,7 +66,7 @@
             </ul>
         </div>
 
-        <div>
+        <div class="w3-container">
             <form method="POST" action="/">
                 Anna alueen nimi:
                 <input type="text" maxlength="30" name="aluenimi"/>

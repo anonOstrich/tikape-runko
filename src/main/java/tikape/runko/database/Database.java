@@ -115,7 +115,9 @@ public class Database {
 
     private List<String> sqliteLauseet() {
         ArrayList<String> lista = new ArrayList<>();
-
+//        lista.add("DROP TABLE Keskustelualue;");
+//        lista.add("DROP TABLE Keskustelunavaus;");
+//        lista.add("DROP TABLE Viesti;");
         // tietokantataulujen luomiseen tarvittavat komennot suoritusjärjestyksessä
         lista.add("CREATE TABLE Keskustelualue(id integer PRIMARY KEY, nimi varchar(30) UNIQUE NOT NULL);");
         lista.add("CREATE TABLE Keskustelunavaus(id integer PRIMARY KEY, keskustelualue integer NOT NULL, nimi varchar(60) NOT NULL, FOREIGN KEY(keskustelualue) REFERENCES Keskustelualue(id));");

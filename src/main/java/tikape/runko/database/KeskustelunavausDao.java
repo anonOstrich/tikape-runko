@@ -17,11 +17,6 @@ public class KeskustelunavausDao implements Dao<Keskustelunavaus, Integer> {
         this.keskustelualueDao = keskustelualueDao;
     }
 
-    @Override
-    public List findAll() throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
     public int createFirstMessage(int alue_id, String avaus_nimi, String sisalto, String nimimerkki) throws SQLException {
         int palautettava = -1;
         if (database.usesPostgres()) {
@@ -64,6 +59,7 @@ public class KeskustelunavausDao implements Dao<Keskustelunavaus, Integer> {
         if (onRajoitettu) {
             query += "LIMIT 10";
         }
+        
         query += ";";
 
         Connection conn = database.getConnection();
@@ -125,9 +121,16 @@ public class KeskustelunavausDao implements Dao<Keskustelunavaus, Integer> {
         return new Keskustelunavaus(avaus_id, avaus_nimi, keskustelualue);
     }
 
-    public int montakoAvaustaAlueella(int alue_id) throws SQLException{
+    public int montakoAvaustaAlueella(int alue_id) throws SQLException {
         List<Integer> tulos = database.queryAndCollect("SELECT COUNT(*) FROM Keskustelunavaus WHERE keskustelualue = ?;", rs -> rs.getInt(1), alue_id);
-        if (tulos == null || tulos.isEmpty()) return -1;         
-        return tulos.get(0); 
+        if (tulos == null || tulos.isEmpty()) {
+            return -1;
+        }
+        return tulos.get(0);
+    }
+
+    @Override
+    public List findAll() throws SQLException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

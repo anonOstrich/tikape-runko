@@ -50,12 +50,9 @@ public class KeskustelualueDao implements Dao<Keskustelualue, Integer> {
         List<Object> uusimmat = new ArrayList();
 
         while (rs.next()) {
-            // MUUTOS
             String aluenimi = rs.getString("alue");
             int id = rs.getInt("id");
             Keskustelualue alue = new Keskustelualue(id, aluenimi);
-            
-            // MUUTOS
             
             String lkm = "" + rs.getInt(3);
             String uusin = "" + rs.getString("viimeisin_viesti");
@@ -70,6 +67,7 @@ public class KeskustelualueDao implements Dao<Keskustelualue, Integer> {
             }
 
         }
+        
         rs.close();
         stmt.close();
 

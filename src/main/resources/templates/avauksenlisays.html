@@ -12,16 +12,16 @@
                 <a href="/" class ="w3-bar-item w3-button">Etusivulle</a>
             </nav>
 
-            <div>
+            <div class="w3-container">
  
 
                 <h1>Alue: <span th:text="${alue.nimi}">sopiva alue</span></h1>
                 <form method="POST">
-                    <input type="text" name="otsikko" placeholder="Kirjoita otsikko" /> <br/><br/>
+                    <input type="text" maxlength="60" name="otsikko" placeholder="Kirjoita otsikko" />  Kaikki kent&#228;t ovat pakollisia.<br/><br/>
                     Max. 2000 merkki&#228;:<br/>
-                    <textarea maxlength ="2000" name ="sisalto" rows="20" cols="50" placeholder="Kirjoita viestisi sis&#228;lt&#246;"></textarea><br/>
+                    <textarea maxlength="2000" name="sisalto" rows="20" cols="50" placeholder="Kirjoita viestisi sis&#228;lt&#246;"></textarea><br/>
                     Sy&#246;t&#228; nimimerkki: <br/>
-                    <input type="text" name="nimimerkki" /> <br/>
+                    <input type="text" maxlength="20" name="nimimerkki" /> <br/>
                     <input type="submit" value="Luo keskustelu!"/>
                 </form>
 

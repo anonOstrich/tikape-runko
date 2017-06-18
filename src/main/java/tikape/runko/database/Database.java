@@ -26,18 +26,15 @@ public class Database {
             lauseet = sqliteLauseet();
         }
 
-        // "try with resources" sulkee resurssin automaattisesti lopuksi
         try (Connection conn = getConnection()) {
             Statement st = conn.createStatement();
 
-            // suoritetaan komennot
             for (String lause : lauseet) {
                 System.out.println("Running command >> " + lause);
                 st.executeUpdate(lause);
             }
 
         } catch (Throwable t) {
-            // jos tietokantataulu on jo olemassa, ei komentoja suoriteta
             System.out.println("Error >> " + t.getMessage());
         }
     }
@@ -110,7 +107,9 @@ public class Database {
         lista.add("CREATE TABLE Keskustelualue (id SERIAL PRIMARY KEY, nimi varchar(30) NOT NULL);");
         lista.add("CREATE TABLE Keskustelunavaus (id SERIAL PRIMARY KEY, keskustelualue int references Keskustelualue (id), nimi varchar(60) NOT NULL);");
         lista.add("CREATE TABLE Viesti (keskustelunavaus int references Keskustelunavaus (id), sisalto varchar(2000) NOT NULL, nimimerkki varchar (20) NOT NULL, aika timestamp DEFAULT now());");
-
+        
+        //TÄHÄN VIELÄ INSERT INTO -LAUSEET??
+        
         return lista;
     }
 

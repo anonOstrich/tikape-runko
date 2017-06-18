@@ -1,6 +1,5 @@
 package tikape.runko;
 
-import java.sql.SQLException;
 import java.util.*;
 import spark.ModelAndView;
 import static spark.Spark.*;

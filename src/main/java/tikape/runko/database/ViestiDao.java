@@ -1,9 +1,7 @@
 package tikape.runko.database;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import tikape.runko.domain.Keskustelunavaus;
 import tikape.runko.domain.Viesti;
 
 public class ViestiDao implements Dao<Viesti, Integer> {
@@ -12,18 +10,6 @@ public class ViestiDao implements Dao<Viesti, Integer> {
 
     public ViestiDao(Database database) {
         this.database = database;
-    }
-
-    @Override
-    public List findAll() throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-// Käytetäänkö ikinä lopullisessa toteutuksessa? 
-    public List<Viesti> findAllWithAreaId(int area_id) throws SQLException {
-        return database.queryAndCollect("SELECT * FROM Viesti WHERE keskustelunavaus = ?;",
-                rs -> new Viesti(rs.getString("sisalto"), rs.getString("nimimerkki"), null),
-                area_id);
     }
 
     public List<Viesti> find20WithAreaId(int area_id, int page) throws SQLException {
@@ -47,7 +33,6 @@ public class ViestiDao implements Dao<Viesti, Integer> {
         database.update(query, avaus_id, sisalto, nimimerkki);
     }
 
-    //jos tulee postgre-ongelmia, hae kaikki viestit ja laske listan koko
     public int montakoViestiaAvauksessa(int avaus_id) throws SQLException {
         List<Integer> lkm = database.queryAndCollect("SELECT COUNT(*) AS lukumaara FROM Viesti WHERE keskustelunavaus = ?;",
                 rs -> rs.getInt("lukumaara"), avaus_id);
@@ -58,11 +43,6 @@ public class ViestiDao implements Dao<Viesti, Integer> {
         return lkm.get(0);
     }
 
-    @Override
-    public Viesti findOne(Integer key) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
     public int montakoSivuaAvauksessa(int avaus_id) throws SQLException {
         int viestejaAlueella = montakoViestiaAvauksessa(avaus_id);
         int sivujaYhteensa = viestejaAlueella / 20;
@@ -70,5 +50,15 @@ public class ViestiDao implements Dao<Viesti, Integer> {
             sivujaYhteensa++;
         }
         return sivujaYhteensa;
+    }
+
+    @Override
+    public List findAll() throws SQLException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Viesti findOne(Integer key) throws SQLException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

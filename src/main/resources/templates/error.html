@@ -6,13 +6,13 @@
         <meta charset="UTF-8"/>
         <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
     </head>
-    <body>
+    <body class="w3-light-gray">
+        <nav class="w3-bar w3-black">               
+            <a href="/" class ="w3-bar-item w3-button">Etusivulle</a>
+        </nav>
         <div>
             <h3>Hups! Jotain meni pieleen!<br/>
                 <span th:text="${virheviesti}"></span></h3>
-            <form action="/">
-                <input type="submit" value="Takaisin etusivulle?"/>
-            </form>
         </div>
     </body>
 </html>

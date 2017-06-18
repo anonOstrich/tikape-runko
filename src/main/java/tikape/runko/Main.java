@@ -260,10 +260,14 @@ public class Main {
         if (naytettavaSivu > 1) {
             data.put("edellinen", "Edellinen sivu");
             data.put("edellisenOsoite", "/avaus/" + avaus_id + "?sivu=" + (naytettavaSivu - 1));
+        } else {
+            data.put("edellisenId", "hidden");
         }
         if (naytettavaSivu < sivujaYhteensa) {
             data.put("seuraava", "Seuraava sivu");
             data.put("seuraavanOsoite", "/avaus/" + avaus_id + "?sivu=" + (naytettavaSivu + 1));
+        } else {
+            data.put("seuraavanId", "hidden");
         }
 
         //viimeiselle ja ensimmäiselle aina linkit, vaikka oltaisiin jo. 

@@ -6,33 +6,36 @@
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+        <style>
+            #hidden{
+                display:none; 
+            }
+        </style>
+
     </head>
-    <body>
+    <body class="w3-light-gray">
         <div>
-            <form action="/">
-                <input type="submit" value="Etusivulle"/>
-            </form>
-            <form th:action="${'/alue/' + avaus.keskustelualue.id}">
-                <input type="submit" value="Takaisin keskustelualueelle"/>
-            </form>
 
-            <nav>
-
-                <a th:href="${ensimmaisenOsoite}">Ensimm&#228;inen sivu</a>
-                <a th:href="${edellisenOsoite}"><span th:text="${edellinen}">Edellinen</span></a>
-                <a th:href="${seuraavanOsoite}"><span th:text="${seuraava}">Seuraava</span></a> 
-                <a th:href="${viimeisenOsoite}">Viimeinen sivu</a>
-
+            <nav class="w3-bar w3-black">               
+                <a href="/" class ="w3-bar-item w3-button w3-mobile">Etusivulle</a>
+                <a th:href="${'/alue/' + avaus.keskustelualue.id}" class="w3-bar-item w3-button w3-mobile">Takaisin keskustelualueelle</a>
+                <a th:href="${ensimmaisenOsoite}" class="w3-bar-item w3-button w3-mobile" th:id="${edellisenId}">Ensimm&#228;inen sivu</a>
+                <a th:href="${edellisenOsoite}" class="w3-bar-item w3-button w3-mobile" th:id="${edellisenId}"><span th:text="${edellinen}">Edellinen</span></a>
+                <a th:href="${seuraavanOsoite}" class="w3-bar-item w3-button w3-mobile" th:id="${seuraavanId}"><span th:text="${seuraava}">Seuraava</span></a> 
+                <a th:href="${viimeisenOsoite}" class="w3-bar-item w3-button w3-mobile" th:id="${seuraavanId}">Viimeinen sivu</a>
             </nav>
         </div>
-        <h3>Alue: <span th:text="${avaus.keskustelualue.nimi}"></span> &#8594; <span th:text="${avaus.nimi}"></span></h3>
+        <div class="w3-container w3-leftbar w3-border-black"><h3>Alue: <span th:text="${avaus.keskustelualue.nimi}">            
+                </span> &#8594; <span th:text="${avaus.nimi}"></span></h3>
+        </div>
 
-        <ol th:start="${ylimmanViestinNumero}">
+        <div class="w3-container">
+        <ol th:start="${ylimmanViestinNumero}" >
             <li th:each="viesti:${viestit}">
                 <span th:text="${viesti}">Viestisisältö</span>                
             </li>
         </ol> 
-
+        </div>
         <button class="w3-btn" onclick="document.getElementById('id01').style.display = 'block'">Kirjoita viesti</button>
 
         <div id="id01" class="w3-panel w3-teal w3-display-container" style="display:none">

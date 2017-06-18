@@ -4,30 +4,27 @@
         <title>Aloita keskustelu</title>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
     </head>
-    <body>
-        <div>
-            <form action="/">
-                <input type="submit" value="Etusivulle"/>
-            </form>
-        </div>
+    <body class="w3-light-gray">
+   
+            <nav class="w3-bar w3-black">               
+                <a href="/" class ="w3-bar-item w3-button">Etusivulle</a>
+            </nav>
 
-        <div>
-            <!-- Pitäisikö toteuttaa lisää ohjeistusta viestin kirjoittamiseen? Esim. 
-                - montako merkkiä enimmäispituus?(<-toteutettu) Montako vielä jäljellä?
-                + Varmistus ettei voi kirjoittaa suoritettavaa koodia tähän kenttään? Tarvitseeko edes huolehtia? 
-            -->
+            <div>
+ 
 
-            <h1>Alue: <span th:text="${alue.nimi}">sopiva alue</span></h1>
-            <form method="POST">
-                <input type="text" name="otsikko" placeholder="Kirjoita otsikko" /> <br/><br/>
-                Max. 2000 merkki&#228;:<br/>
-                <textarea maxlength ="2000" name ="sisalto" rows="20" cols="50" placeholder="Kirjoita viestisi sis&#228;lt&#246;"></textarea><br/>
-                Sy&#246;t&#228; nimimerkki: <br/>
-                <input type="text" name="nimimerkki" /> <br/>
-                <input type="submit" value="Luo keskustelu!"/>
-            </form>
+                <h1>Alue: <span th:text="${alue.nimi}">sopiva alue</span></h1>
+                <form method="POST">
+                    <input type="text" name="otsikko" placeholder="Kirjoita otsikko" /> <br/><br/>
+                    Max. 2000 merkki&#228;:<br/>
+                    <textarea maxlength ="2000" name ="sisalto" rows="20" cols="50" placeholder="Kirjoita viestisi sis&#228;lt&#246;"></textarea><br/>
+                    Sy&#246;t&#228; nimimerkki: <br/>
+                    <input type="text" name="nimimerkki" /> <br/>
+                    <input type="submit" value="Luo keskustelu!"/>
+                </form>
 
-        </div>
+            </div>
     </body>
 </html>

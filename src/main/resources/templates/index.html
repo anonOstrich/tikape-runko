@@ -12,20 +12,23 @@
                 list-style:none;
                 padding:0;
             }
-            
+
             .menuelement{display:inline-block;                        
-                        margin-right: 1em;}
-            
+                         margin-right: 1em;}
+
             .listelement{
                 text-align: left;
             }
-         
+
         </style>
     </head>
 
-    <body>
+    <body class="w3-light-gray">
+        <nav class="w3-bar w3-black">               
+            <a href="/" class ="w3-bar-item w3-button">Etusivulle</a>
+        </nav>
 
-        
+
         <div>
             <ul>
                 <li class = "menuelement">
@@ -45,7 +48,7 @@
                     </ul>
                 </li>
                 <li class = "menuelement">
-                    <h3>Viimeisin viesti</h3>
+                    <h3>Viimeisin viesti (GMT+0)</h3>
                     <ul>
                         <li th:each="uusi:${uusimmat}" class="listelement">
                             <span th:text="${uusi}">aikaleima</span>
@@ -54,7 +57,7 @@
                 </li>
             </ul>
         </div>
-        
+
         <div>
             <form method="POST" action="/">
                 Anna alueen nimi:

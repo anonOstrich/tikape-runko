@@ -6,6 +6,11 @@
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <style>
+            a:hover{
+                color: rgb(160, 160, 160);
+                text-decoration: none; 
+            }
+            
             ul{
                 list-style:none;
                 padding:0;
@@ -21,13 +26,12 @@
         </style>
         <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
     </head>
-    <body>
-        <div>
-            <form action="/">
-                <input type="submit" value="Etusivulle"/>
-            </form>
-        </div>
-        <div>
+    <body class="w3-light-gray">
+        <nav class="w3-bar w3-black">               
+            <a href="/" class ="w3-bar-item w3-button">Etusivulle</a>
+        </nav>
+
+        <div class="w3-container">
             <ul>
                 <li class = "menuelement">
                     <h3>Alue: <span th:text="${alue.nimi}">aluenimi</span></h3>
@@ -46,7 +50,7 @@
                     </ul>
                 </li>
                 <li class = "menuelement">
-                    <h3>Viimeisin viesti</h3>
+                    <h3>Viimeisin viesti (GMT+0)</h3>
                     <ul>
                         <li th:each="uusi:${uusimmat}" class="listelement">
                             <span th:text="${uusi}">aikaleima</span>
@@ -57,7 +61,7 @@
 
             <a th:href="${toisenNakymanOsoite}"><span th:text="${nakymanMuutosTeksti}"></span></a><span th:text="${tietoPiilotetuista}"></span>
         </div>
-        <div>
+        <div class="w3-container">
             <a th:href="${'/alue/' + alue.id + '/lisaa'}">Aloita uusi keskustelu</a>
         </div>
     </body>

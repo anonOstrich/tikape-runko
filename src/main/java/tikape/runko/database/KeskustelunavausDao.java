@@ -48,6 +48,7 @@ public class KeskustelunavausDao implements Dao<Keskustelunavaus, Integer> {
         return palautettava.get(0);
     }
 
+    //Hyvin samantapainen kuin KeskustelualueDaon vastaava metodi
     public List createView(int id, boolean onRajoitettu) throws SQLException {
         String query = "SELECT avaus.nimi, COUNT(viesti.sisalto) Viestejä, MAX(viesti.aika) Viimeisin_viesti, avaus.id "
                 + "FROM Keskustelunavaus avaus, Keskustelualue alue, Viesti "

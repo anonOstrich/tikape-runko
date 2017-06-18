@@ -12,6 +12,7 @@ public class ViestiDao implements Dao<Viesti, Integer> {
         this.database = database;
     }
 
+    //palauttaa listan sivun page viesteistä, kun viestejä sivulla k kappaletta. 
     public List<Viesti> findkWithAreaId(int area_id,int k,  int page) throws SQLException {
         if (page < 1) {
             page = 1;

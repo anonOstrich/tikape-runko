@@ -98,27 +98,15 @@ public class Database {
     private List<String> postgreLauseet() {
         ArrayList<String> lista = new ArrayList<>();
 
-        // tietokantataulujen luomiseen tarvittavat komennot suoritusjärjestyksessä
-//        lista.add("DROP TABLE Viesti;");
-//        lista.add("DROP TABLE Keskustelunavaus;");
-//        lista.add("DROP TABLE Keskustelualue;");
-        // heroku käyttää SERIAL-avainsanaa uuden tunnuksen automaattiseen luomiseen
-        //NOT NULL varmasti käytettävissä???
         lista.add("CREATE TABLE Keskustelualue (id SERIAL PRIMARY KEY, nimi varchar(30) NOT NULL);");
         lista.add("CREATE TABLE Keskustelunavaus (id SERIAL PRIMARY KEY, keskustelualue int references Keskustelualue (id), nimi varchar(60) NOT NULL);");
         lista.add("CREATE TABLE Viesti (keskustelunavaus int references Keskustelunavaus (id), sisalto varchar(2000) NOT NULL, nimimerkki varchar (20) NOT NULL, aika timestamp DEFAULT now());");
-        
-        //TÄHÄN VIELÄ INSERT INTO -LAUSEET??
         
         return lista;
     }
 
     private List<String> sqliteLauseet() {
         ArrayList<String> lista = new ArrayList<>();
-//        lista.add("DROP TABLE Keskustelualue;");
-//        lista.add("DROP TABLE Keskustelunavaus;");
-//        lista.add("DROP TABLE Viesti;");
-        // tietokantataulujen luomiseen tarvittavat komennot suoritusjärjestyksessä
         lista.add("CREATE TABLE Keskustelualue(id integer PRIMARY KEY, nimi varchar(30) UNIQUE NOT NULL);");
         lista.add("CREATE TABLE Keskustelunavaus(id integer PRIMARY KEY, keskustelualue integer NOT NULL, nimi varchar(60) NOT NULL, FOREIGN KEY(keskustelualue) REFERENCES Keskustelualue(id));");
         lista.add("CREATE TABLE Viesti(keskustelunavaus integer NOT NULL, sisalto varchar(2000) NOT NULL, nimimerkki varchar(20) NOT NULL, aika datetime NOT NULL, FOREIGN KEY(keskustelunavaus) REFERENCES Keskustelunavaus(id));");

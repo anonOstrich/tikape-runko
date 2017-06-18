@@ -33,6 +33,11 @@ public class KeskustelualueDao implements Dao<Keskustelualue, Integer> {
                 rs -> new Keskustelualue(rs.getInt("id"), rs.getString("nimi")));
     }
 
+    
+    //palauttaa listan, joista muodostetaan etusivun näkymä: 
+    //0: Alueet Java-olioina
+    //1: viestien lukumäärät merkkijonoina
+    //2: viimeisimmän aluuen viestin ajankohta merkkijonona
     public List<List<Object>> createView() throws SQLException {
         String query = "SELECT alue.nimi AS alue, alue.id AS id, COUNT(viesti.sisalto) viestejä, MAX(viesti.aika) viimeisin_viesti "
                 + "FROM Keskustelualue alue "

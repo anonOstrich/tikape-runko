@@ -17,7 +17,7 @@ public class Main {
         if (System.getenv("PORT") != null) {
             port(Integer.valueOf(System.getenv("PORT")));
         }
-
+        
         Database database = new Database(selvitaJdbcOsoite());
         KeskustelualueDao keskustelualueDao = new KeskustelualueDao(database);
         KeskustelunavausDao keskustelunavausDao = new KeskustelunavausDao(database, keskustelualueDao);
@@ -28,6 +28,8 @@ public class Main {
             HashMap<String, Object> data = new HashMap();
             List<List<Object>> nakyma = keskustelualueDao.createView();
 
+            //HashMapilla avaimina index.html:n käyttämät merkkijonot, joita vastaavat arvot
+            //ovat nakyma-listan kolme listaa
             data.put("alueet", nakyma.get(0));
             data.put("viestienLukumaarat", nakyma.get(1));
             data.put("uusimmat", siistiPaivamaarat(nakyma.get(2)));
@@ -38,8 +40,10 @@ public class Main {
         //UUDEN ALUEEN LISÄÄMINEN
         post("/", (req, res) -> {
             String nimi = req.queryParams("aluenimi");
-
             Keskustelualue alue = new Keskustelualue(99, nimi);
+            
+            //jos alueen luonti ei onnistu, lähetetään virhe viesti, 
+            //että ainoa vaadittava kenttä oli tyhjä
             boolean onnistui = keskustelualueDao.addNew(alue);
 
             if (!onnistui) {
@@ -93,6 +97,7 @@ public class Main {
             data.put("avaukset", nakyma.get(0));
             data.put("viestienLukumaarat", nakyma.get(1));
             data.put("uusimmat", siistiPaivamaarat(nakyma.get(2)));
+            
             return new ModelAndView(data, "avaukset");
         }, new ThymeleafTemplateEngine());
         
@@ -105,6 +110,7 @@ public class Main {
         get("/alue/:id/lisaa", (req, res) -> {
             HashMap<String, Object> data = new HashMap();
             int alue_id = muunnaKokonaisluvuksi(req.params(":id"));
+            //tarkistetaan aluetunnus
             if (alue_id < 0) {
                 aiheutaVirheViestilla("Virheellinen aluetunnus");
             }
@@ -127,6 +133,7 @@ public class Main {
             String sisalto = req.queryParams("sisalto");
             String nimimerkki = req.queryParams("nimimerkki");
 
+            //tarkistetaan, onko jokin kenttä tyhjä
             if (otsikko.trim().isEmpty() || sisalto.trim().isEmpty() || nimimerkki.trim().isEmpty()) {
                 return aiheutaVirheViestilla("Et täyttänyt kaikkia pakollisia kenttiä.");
             }
@@ -185,6 +192,7 @@ public class Main {
             return new ModelAndView(data, "viestit");
         }, new ThymeleafTemplateEngine());
         
+        //OHJATTU VÄÄRÄÄN OSOITTEESEEN
         get("/avaus/:id/", (req, res) -> {
             res.redirect("/avaus/" + req.params(":id"));
            return aiheutaVirheViestilla(""); 

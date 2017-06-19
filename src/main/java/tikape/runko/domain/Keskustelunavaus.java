@@ -11,6 +11,8 @@ public class Keskustelunavaus {
         this.nimi = nimi;
         this.keskustelualue = keskustelualue;
     }
+    
+    //setterit ja getterit alla
 
     public Keskustelunavaus(int id, String nimi) {
         this(id, nimi, null);

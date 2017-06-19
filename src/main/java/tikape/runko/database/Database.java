@@ -95,6 +95,8 @@ public class Database {
         return palautettava;
     }
 
+    //Ei DROP TABLE -komentoja, koska tietokanta halutaan pitää yllä.
+    //Nämä tulisi lisätä ennen CREATE TABLE -lauseita, jos niitä haluttaisiin käyttää.
     private List<String> postgreLauseet() {
         ArrayList<String> lista = new ArrayList<>();
 

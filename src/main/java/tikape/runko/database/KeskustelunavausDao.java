@@ -26,7 +26,7 @@ public class KeskustelunavausDao implements Dao<Keskustelunavaus, Integer> {
         }
         return palautettava;
     }
-
+    
     public int createFirstMessagePostgres(int alue_id, String avaus_nimi, String sisalto, String nimimerkki) throws SQLException {
         database.update("BEGIN TRANSACTION;");
         database.update("INSERT INTO Keskustelunavaus(keskustelualue, nimi) VALUES (?, ?);",
@@ -38,7 +38,6 @@ public class KeskustelunavausDao implements Dao<Keskustelunavaus, Integer> {
         return palautettava.get(0);
     }
 
-    //jostain syystä paikallisesti transaktio epäonnistuu. Käytännössä pärjätään varmasti hyvin ilmankin, tosin... 
     public int createFirstMessageSQLite(int alue_id, String avaus_nimi, String sisalto, String nimimerkki) throws SQLException {
         database.update("INSERT INTO Keskustelunavaus(keskustelualue, nimi) VALUES (?, ?);",
                 alue_id, avaus_nimi);
@@ -48,7 +47,6 @@ public class KeskustelunavausDao implements Dao<Keskustelunavaus, Integer> {
         return palautettava.get(0);
     }
 
-    //Hyvin samantapainen kuin KeskustelualueDaon vastaava metodi
     public List createView(int id, boolean onRajoitettu) throws SQLException {
         String query = "SELECT avaus.nimi, COUNT(viesti.sisalto) Viestejä, MAX(viesti.aika) Viimeisin_viesti, avaus.id "
                 + "FROM Keskustelunavaus avaus, Keskustelualue alue, Viesti "
@@ -67,11 +65,13 @@ public class KeskustelunavausDao implements Dao<Keskustelunavaus, Integer> {
         Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery(query);
 
+        //luodaan lista, ja sille kolme listaa talletettaviksi
         List<List<Object>> listat = new ArrayList();
         List<Object> avaukset = new ArrayList();
         List<Object> lukumaarat = new ArrayList();
         List<Object> uusimmat = new ArrayList();
 
+        //käydään ResultSet läpi ja talletetaan tiedot listoihin
         while (rs.next()) {
             String avaus_nimi = rs.getString(1);
             int avaus_id = rs.getInt(4);
@@ -82,6 +82,8 @@ public class KeskustelunavausDao implements Dao<Keskustelunavaus, Integer> {
             avaukset.add(avaus);
             lukumaarat.add(lkm);
 
+            //jos kolmannen listan tieto on null tai merkkijonon pituus on lyhyempi kuin kuusi
+            //on tämä käytännössä sama kuin "ei viestejä", jolloin syötetään listalle tämä arvo
             if (uusin == null || uusin.length() < 6) {
                 uusimmat.add("Ei viestejä");
             } else {
@@ -92,6 +94,7 @@ public class KeskustelunavausDao implements Dao<Keskustelunavaus, Integer> {
         stmt.close();
         conn.close();
 
+        //lisätään kollektiiviseen listaan kolme alilistaa ja palautetaan kollektiivinen
         listat.add(avaukset);
         listat.add(lukumaarat);
         listat.add(uusimmat);

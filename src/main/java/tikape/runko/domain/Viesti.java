@@ -1,10 +1,9 @@
-
 package tikape.runko.domain;
 
 import java.sql.*;
 
 public class Viesti {
-    
+
     private String sisalto;
     private String nimimerkki;
     private Timestamp aika;
@@ -16,14 +15,17 @@ public class Viesti {
         this.aika = aika;
         this.keskustelunavaus = keskustelunavaus;
     }
-    
-        public Viesti(String sisalto, String nimimerkki, Timestamp aika) {
+
+    //myös konstruktori ilman Keskustelunavaus-oliota
+    public Viesti(String sisalto, String nimimerkki, Timestamp aika) {
         this.sisalto = sisalto;
         this.nimimerkki = nimimerkki;
         this.aika = aika;
         this.keskustelunavaus = null;
     }
 
+    //getterit ja setterit alla, myös toString-metodin override
+    
     public String getSisalto() {
         return sisalto;
     }
@@ -54,10 +56,10 @@ public class Viesti {
 
     public void setKeskustelunavaus(Keskustelunavaus keskustelunavaus) {
         this.keskustelunavaus = keskustelunavaus;
-    }   
-    
+    }
+
     @Override
-    public String toString(){
+    public String toString() {
         return this.sisalto + " t. " + this.nimimerkki;
     }
 }

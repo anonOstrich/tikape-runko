@@ -11,6 +11,8 @@ public class Keskustelualue {
         this.nimi = nimi;
     }
 
+    //setterit ja getterit alla
+    
     public int getId() {
         return id;
     }
